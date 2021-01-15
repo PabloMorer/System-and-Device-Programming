@@ -1,0 +1,2357 @@
+
+lab5.elf:     file format elf32-littlearm
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         00001800  0c100000  0c100000  00008000  2**2
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .rodata       0000059c  0c101800  0c101800  00009800  2**2
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+  2 .debug_abbrev 000002bb  00000000  00000000  00009d9c  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  3 .debug_info   00000930  00000000  00000000  0000a057  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  4 .debug_line   00000481  00000000  00000000  0000a987  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  5 .debug_macinfo 00012c3e  00000000  00000000  0000ae08  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  6 .debug_loc    0000091c  00000000  00000000  0001da46  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  7 .debug_pubnames 000003c6  00000000  00000000  0001e362  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  8 .debug_pubtypes 000000c4  00000000  00000000  0001e728  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  9 .debug_aranges 00000080  00000000  00000000  0001e7ec  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 10 .debug_str    000003e4  00000000  00000000  0001e86c  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 11 .comment      0000002a  00000000  00000000  0001ec50  2**0
+                  CONTENTS, READONLY
+ 12 .ARM.attributes 00000032  00000000  00000000  0001ec7a  2**0
+                  CONTENTS, READONLY
+ 13 .debug_frame  0000086c  00000000  00000000  0001ecac  2**2
+                  CONTENTS, READONLY, DEBUGGING
+
+Disassembly of section .text:
+
+0c100000 <main>:
+#include <rtc.h>
+
+void isr_tick( void ) __attribute__ ((interrupt ("IRQ")));
+
+void main( void )
+{
+ c100000:	e1a0c00d 	mov	ip, sp
+ c100004:	e92dd800 	push	{fp, ip, lr, pc}
+ c100008:	e24cb004 	sub	fp, ip, #4
+ c10000c:	e24dd008 	sub	sp, sp, #8
+    rtc_time_t rtc_time;
+    
+    sys_init();
+ c100010:	eb00027c 	bl	c100a08 <sys_init>
+    uart0_init();
+ c100014:	eb0004b3 	bl	c1012e8 <uart0_init>
+    rtc_init();
+ c100018:	eb000088 	bl	c100240 <rtc_init>
+
+    /************************************/
+
+    rtc_gettime( &rtc_time );
+ c10001c:	e24b3014 	sub	r3, fp, #20
+ c100020:	e1a00003 	mov	r0, r3
+ c100024:	eb000184 	bl	c10063c <rtc_gettime>
+
+    uart0_puts( "\n\nFecha y hora iniciales: " );
+ c100028:	e59f012c 	ldr	r0, [pc, #300]	; c10015c <main+0x15c>
+ c10002c:	eb0004ec 	bl	c1013e4 <uart0_puts>
+    uart0_putint( rtc_time.mday );
+ c100030:	e55b3011 	ldrb	r3, [fp, #-17]	; 0xffffffef
+ c100034:	e1a00003 	mov	r0, r3
+ c100038:	eb0004fd 	bl	c101434 <uart0_putint>
+    uart0_putchar( '/' );
+ c10003c:	e3a0002f 	mov	r0, #47	; 0x2f
+ c100040:	eb0004c1 	bl	c10134c <uart0_putchar>
+    uart0_putint( rtc_time.mon );
+ c100044:	e55b300f 	ldrb	r3, [fp, #-15]
+ c100048:	e1a00003 	mov	r0, r3
+ c10004c:	eb0004f8 	bl	c101434 <uart0_putint>
+    uart0_putchar( '/' );
+ c100050:	e3a0002f 	mov	r0, #47	; 0x2f
+ c100054:	eb0004bc 	bl	c10134c <uart0_putchar>
+    uart0_putint( rtc_time.year );
+ c100058:	e55b300e 	ldrb	r3, [fp, #-14]
+ c10005c:	e1a00003 	mov	r0, r3
+ c100060:	eb0004f3 	bl	c101434 <uart0_putint>
+    uart0_putchar( ' ' );
+ c100064:	e3a00020 	mov	r0, #32
+ c100068:	eb0004b7 	bl	c10134c <uart0_putchar>
+    uart0_putint( rtc_time.hour );
+ c10006c:	e55b3012 	ldrb	r3, [fp, #-18]	; 0xffffffee
+ c100070:	e1a00003 	mov	r0, r3
+ c100074:	eb0004ee 	bl	c101434 <uart0_putint>
+    uart0_putchar( ':' );
+ c100078:	e3a0003a 	mov	r0, #58	; 0x3a
+ c10007c:	eb0004b2 	bl	c10134c <uart0_putchar>
+    uart0_putint( rtc_time.min );
+ c100080:	e55b3013 	ldrb	r3, [fp, #-19]	; 0xffffffed
+ c100084:	e1a00003 	mov	r0, r3
+ c100088:	eb0004e9 	bl	c101434 <uart0_putint>
+    uart0_putchar( ':' );
+ c10008c:	e3a0003a 	mov	r0, #58	; 0x3a
+ c100090:	eb0004ad 	bl	c10134c <uart0_putchar>
+    uart0_putint( rtc_time.sec );
+ c100094:	e55b3014 	ldrb	r3, [fp, #-20]	; 0xffffffec
+ c100098:	e1a00003 	mov	r0, r3
+ c10009c:	eb0004e4 	bl	c101434 <uart0_putint>
+
+    /************************************/
+
+    uart0_puts( "\nIntroduzca nueva fecha\n" );
+ c1000a0:	e59f00b8 	ldr	r0, [pc, #184]	; c100160 <main+0x160>
+ c1000a4:	eb0004ce 	bl	c1013e4 <uart0_puts>
+    uart0_puts( "  - Dia: " );
+ c1000a8:	e59f00b4 	ldr	r0, [pc, #180]	; c100164 <main+0x164>
+ c1000ac:	eb0004cc 	bl	c1013e4 <uart0_puts>
+    rtc_time.mday = (uint8) uart0_getint();
+ c1000b0:	eb000558 	bl	c101618 <uart0_getint>
+ c1000b4:	e1a03000 	mov	r3, r0
+ c1000b8:	e20330ff 	and	r3, r3, #255	; 0xff
+ c1000bc:	e54b3011 	strb	r3, [fp, #-17]	; 0xffffffef
+    uart0_puts( "  - Mes: " );
+ c1000c0:	e59f00a0 	ldr	r0, [pc, #160]	; c100168 <main+0x168>
+ c1000c4:	eb0004c6 	bl	c1013e4 <uart0_puts>
+    rtc_time.mon = (uint8) uart0_getint();
+ c1000c8:	eb000552 	bl	c101618 <uart0_getint>
+ c1000cc:	e1a03000 	mov	r3, r0
+ c1000d0:	e20330ff 	and	r3, r3, #255	; 0xff
+ c1000d4:	e54b300f 	strb	r3, [fp, #-15]
+    uart0_puts( "  - Año (2 digitos): " );
+ c1000d8:	e59f008c 	ldr	r0, [pc, #140]	; c10016c <main+0x16c>
+ c1000dc:	eb0004c0 	bl	c1013e4 <uart0_puts>
+    rtc_time.year = (uint8) uart0_getint();
+ c1000e0:	eb00054c 	bl	c101618 <uart0_getint>
+ c1000e4:	e1a03000 	mov	r3, r0
+ c1000e8:	e20330ff 	and	r3, r3, #255	; 0xff
+ c1000ec:	e54b300e 	strb	r3, [fp, #-14]
+    uart0_puts( "Introduzca nueva hora\n" );
+ c1000f0:	e59f0078 	ldr	r0, [pc, #120]	; c100170 <main+0x170>
+ c1000f4:	eb0004ba 	bl	c1013e4 <uart0_puts>
+    uart0_puts( "  - Hora: " );
+ c1000f8:	e59f0074 	ldr	r0, [pc, #116]	; c100174 <main+0x174>
+ c1000fc:	eb0004b8 	bl	c1013e4 <uart0_puts>
+    rtc_time.hour = (uint8) uart0_getint();
+ c100100:	eb000544 	bl	c101618 <uart0_getint>
+ c100104:	e1a03000 	mov	r3, r0
+ c100108:	e20330ff 	and	r3, r3, #255	; 0xff
+ c10010c:	e54b3012 	strb	r3, [fp, #-18]	; 0xffffffee
+    uart0_puts( "  - Minuto: " );
+ c100110:	e59f0060 	ldr	r0, [pc, #96]	; c100178 <main+0x178>
+ c100114:	eb0004b2 	bl	c1013e4 <uart0_puts>
+    rtc_time.min = (uint8) uart0_getint();
+ c100118:	eb00053e 	bl	c101618 <uart0_getint>
+ c10011c:	e1a03000 	mov	r3, r0
+ c100120:	e20330ff 	and	r3, r3, #255	; 0xff
+ c100124:	e54b3013 	strb	r3, [fp, #-19]	; 0xffffffed
+    uart0_puts( "  - Segundo: " );
+ c100128:	e59f004c 	ldr	r0, [pc, #76]	; c10017c <main+0x17c>
+ c10012c:	eb0004ac 	bl	c1013e4 <uart0_puts>
+    rtc_time.sec = (uint8) uart0_getint();
+ c100130:	eb000538 	bl	c101618 <uart0_getint>
+ c100134:	e1a03000 	mov	r3, r0
+ c100138:	e20330ff 	and	r3, r3, #255	; 0xff
+ c10013c:	e54b3014 	strb	r3, [fp, #-20]	; 0xffffffec
+
+    rtc_puttime( &rtc_time );
+ c100140:	e24b3014 	sub	r3, fp, #20
+ c100144:	e1a00003 	mov	r0, r3
+ c100148:	eb00008d 	bl	c100384 <rtc_puttime>
+
+    /************************************/
+
+    rtc_open( isr_tick, 127 );
+ c10014c:	e59f002c 	ldr	r0, [pc, #44]	; c100180 <main+0x180>
+ c100150:	e3a0107f 	mov	r1, #127	; 0x7f
+ c100154:	eb0001f7 	bl	c100938 <rtc_open>
+
+    /************************************/
+    
+    while( 1 );
+ c100158:	eafffffe 	b	c100158 <main+0x158>
+ c10015c:	0c101800 	.word	0x0c101800
+ c100160:	0c10181c 	.word	0x0c10181c
+ c100164:	0c101838 	.word	0x0c101838
+ c100168:	0c101844 	.word	0x0c101844
+ c10016c:	0c101850 	.word	0x0c101850
+ c100170:	0c101868 	.word	0x0c101868
+ c100174:	0c101880 	.word	0x0c101880
+ c100178:	0c10188c 	.word	0x0c10188c
+ c10017c:	0c10189c 	.word	0x0c10189c
+ c100180:	0c100184 	.word	0x0c100184
+
+0c100184 <isr_tick>:
+}
+
+void isr_tick( void )
+{
+ c100184:	e52dc004 	push	{ip}		; (str ip, [sp, #-4]!)
+ c100188:	e1a0c00d 	mov	ip, sp
+ c10018c:	e92dd80f 	push	{r0, r1, r2, r3, fp, ip, lr, pc}
+ c100190:	e24cb004 	sub	fp, ip, #4
+ c100194:	e24dd008 	sub	sp, sp, #8
+    rtc_time_t rtc_time;
+    
+    rtc_gettime( &rtc_time );
+ c100198:	e24b3024 	sub	r3, fp, #36	; 0x24
+ c10019c:	e1a00003 	mov	r0, r3
+ c1001a0:	eb000125 	bl	c10063c <rtc_gettime>
+
+    uart0_puts( "\nFecha y hora: " );
+ c1001a4:	e59f008c 	ldr	r0, [pc, #140]	; c100238 <isr_tick+0xb4>
+ c1001a8:	eb00048d 	bl	c1013e4 <uart0_puts>
+    uart0_putint( rtc_time.mday );
+ c1001ac:	e55b3021 	ldrb	r3, [fp, #-33]	; 0xffffffdf
+ c1001b0:	e1a00003 	mov	r0, r3
+ c1001b4:	eb00049e 	bl	c101434 <uart0_putint>
+    uart0_putchar( '/' );
+ c1001b8:	e3a0002f 	mov	r0, #47	; 0x2f
+ c1001bc:	eb000462 	bl	c10134c <uart0_putchar>
+    uart0_putint( rtc_time.mon );
+ c1001c0:	e55b301f 	ldrb	r3, [fp, #-31]	; 0xffffffe1
+ c1001c4:	e1a00003 	mov	r0, r3
+ c1001c8:	eb000499 	bl	c101434 <uart0_putint>
+    uart0_putchar( '/' );
+ c1001cc:	e3a0002f 	mov	r0, #47	; 0x2f
+ c1001d0:	eb00045d 	bl	c10134c <uart0_putchar>
+    uart0_putint( rtc_time.year );
+ c1001d4:	e55b301e 	ldrb	r3, [fp, #-30]	; 0xffffffe2
+ c1001d8:	e1a00003 	mov	r0, r3
+ c1001dc:	eb000494 	bl	c101434 <uart0_putint>
+    uart0_putchar( ' ' );
+ c1001e0:	e3a00020 	mov	r0, #32
+ c1001e4:	eb000458 	bl	c10134c <uart0_putchar>
+    uart0_putint( rtc_time.hour );
+ c1001e8:	e55b3022 	ldrb	r3, [fp, #-34]	; 0xffffffde
+ c1001ec:	e1a00003 	mov	r0, r3
+ c1001f0:	eb00048f 	bl	c101434 <uart0_putint>
+    uart0_putchar( ':' );
+ c1001f4:	e3a0003a 	mov	r0, #58	; 0x3a
+ c1001f8:	eb000453 	bl	c10134c <uart0_putchar>
+    uart0_putint( rtc_time.min );
+ c1001fc:	e55b3023 	ldrb	r3, [fp, #-35]	; 0xffffffdd
+ c100200:	e1a00003 	mov	r0, r3
+ c100204:	eb00048a 	bl	c101434 <uart0_putint>
+    uart0_putchar( ':' );
+ c100208:	e3a0003a 	mov	r0, #58	; 0x3a
+ c10020c:	eb00044e 	bl	c10134c <uart0_putchar>
+    uart0_putint( rtc_time.sec );
+ c100210:	e55b3024 	ldrb	r3, [fp, #-36]	; 0xffffffdc
+ c100214:	e1a00003 	mov	r0, r3
+ c100218:	eb000485 	bl	c101434 <uart0_putint>
+
+    I_ISPC = BIT_TICK;
+ c10021c:	e59f3018 	ldr	r3, [pc, #24]	; c10023c <isr_tick+0xb8>
+ c100220:	e3a02601 	mov	r2, #1048576	; 0x100000
+ c100224:	e5832000 	str	r2, [r3]
+}
+ c100228:	e24bd01c 	sub	sp, fp, #28
+ c10022c:	e89d680f 	ldm	sp, {r0, r1, r2, r3, fp, sp, lr}
+ c100230:	e49dc004 	pop	{ip}		; (ldr ip, [sp], #4)
+ c100234:	e25ef004 	subs	pc, lr, #4
+ c100238:	0c1018ac 	.word	0x0c1018ac
+ c10023c:	01e00024 	.word	0x01e00024
+
+0c100240 <rtc_init>:
+#include <rtc.h>
+
+extern void isr_TICK_dummy( void );
+
+void rtc_init( void )
+{
+ c100240:	e1a0c00d 	mov	ip, sp
+ c100244:	e92dd800 	push	{fp, ip, lr, pc}
+ c100248:	e24cb004 	sub	fp, ip, #4
+    TICNT   = 0;
+ c10024c:	e59f30ec 	ldr	r3, [pc, #236]	; c100340 <rtc_init+0x100>
+ c100250:	e3a02000 	mov	r2, #0
+ c100254:	e5832000 	str	r2, [r3]
+    RTCALM  = 0;    
+ c100258:	e59f30e4 	ldr	r3, [pc, #228]	; c100344 <rtc_init+0x104>
+ c10025c:	e3a02000 	mov	r2, #0
+ c100260:	e5832000 	str	r2, [r3]
+    RTCRST  = 0; 
+ c100264:	e59f30dc 	ldr	r3, [pc, #220]	; c100348 <rtc_init+0x108>
+ c100268:	e3a02000 	mov	r2, #0
+ c10026c:	e5832000 	str	r2, [r3]
+        
+    RTCCON  |= (1 << 0);
+ c100270:	e59f30d4 	ldr	r3, [pc, #212]	; c10034c <rtc_init+0x10c>
+ c100274:	e59f20d0 	ldr	r2, [pc, #208]	; c10034c <rtc_init+0x10c>
+ c100278:	e5922000 	ldr	r2, [r2]
+ c10027c:	e3822001 	orr	r2, r2, #1
+ c100280:	e5832000 	str	r2, [r3]
+    
+    BCDYEAR = 0x13;
+ c100284:	e59f30c4 	ldr	r3, [pc, #196]	; c100350 <rtc_init+0x110>
+ c100288:	e3a02013 	mov	r2, #19
+ c10028c:	e5832000 	str	r2, [r3]
+    BCDMON  = 1;
+ c100290:	e59f30bc 	ldr	r3, [pc, #188]	; c100354 <rtc_init+0x114>
+ c100294:	e3a02001 	mov	r2, #1
+ c100298:	e5832000 	str	r2, [r3]
+    BCDDAY  = 1;
+ c10029c:	e59f30b4 	ldr	r3, [pc, #180]	; c100358 <rtc_init+0x118>
+ c1002a0:	e3a02001 	mov	r2, #1
+ c1002a4:	e5832000 	str	r2, [r3]
+    BCDDATE = 1;
+ c1002a8:	e59f30ac 	ldr	r3, [pc, #172]	; c10035c <rtc_init+0x11c>
+ c1002ac:	e3a02001 	mov	r2, #1
+ c1002b0:	e5832000 	str	r2, [r3]
+    BCDHOUR = 00;
+ c1002b4:	e59f30a4 	ldr	r3, [pc, #164]	; c100360 <rtc_init+0x120>
+ c1002b8:	e3a02000 	mov	r2, #0
+ c1002bc:	e5832000 	str	r2, [r3]
+    BCDMIN  = 00;
+ c1002c0:	e59f309c 	ldr	r3, [pc, #156]	; c100364 <rtc_init+0x124>
+ c1002c4:	e3a02000 	mov	r2, #0
+ c1002c8:	e5832000 	str	r2, [r3]
+    BCDSEC  = 00;
+ c1002cc:	e59f3094 	ldr	r3, [pc, #148]	; c100368 <rtc_init+0x128>
+ c1002d0:	e3a02000 	mov	r2, #0
+ c1002d4:	e5832000 	str	r2, [r3]
+
+    ALMYEAR = 0;
+ c1002d8:	e59f308c 	ldr	r3, [pc, #140]	; c10036c <rtc_init+0x12c>
+ c1002dc:	e3a02000 	mov	r2, #0
+ c1002e0:	e5832000 	str	r2, [r3]
+    ALMMON  = 0;
+ c1002e4:	e59f3084 	ldr	r3, [pc, #132]	; c100370 <rtc_init+0x130>
+ c1002e8:	e3a02000 	mov	r2, #0
+ c1002ec:	e5832000 	str	r2, [r3]
+    ALMDAY  = 0;
+ c1002f0:	e59f307c 	ldr	r3, [pc, #124]	; c100374 <rtc_init+0x134>
+ c1002f4:	e3a02000 	mov	r2, #0
+ c1002f8:	e5832000 	str	r2, [r3]
+    ALMHOUR = 0;
+ c1002fc:	e59f3074 	ldr	r3, [pc, #116]	; c100378 <rtc_init+0x138>
+ c100300:	e3a02000 	mov	r2, #0
+ c100304:	e5832000 	str	r2, [r3]
+    ALMMIN  = 0;
+ c100308:	e59f306c 	ldr	r3, [pc, #108]	; c10037c <rtc_init+0x13c>
+ c10030c:	e3a02000 	mov	r2, #0
+ c100310:	e5832000 	str	r2, [r3]
+    ALMSEC  = 0;
+ c100314:	e59f3064 	ldr	r3, [pc, #100]	; c100380 <rtc_init+0x140>
+ c100318:	e3a02000 	mov	r2, #0
+ c10031c:	e5832000 	str	r2, [r3]
+
+    RTCCON &= ~(1 << 0);
+ c100320:	e59f3024 	ldr	r3, [pc, #36]	; c10034c <rtc_init+0x10c>
+ c100324:	e59f2020 	ldr	r2, [pc, #32]	; c10034c <rtc_init+0x10c>
+ c100328:	e5922000 	ldr	r2, [r2]
+ c10032c:	e3c22001 	bic	r2, r2, #1
+ c100330:	e5832000 	str	r2, [r3]
+}
+ c100334:	e24bd00c 	sub	sp, fp, #12
+ c100338:	e89d6800 	ldm	sp, {fp, sp, lr}
+ c10033c:	e12fff1e 	bx	lr
+ c100340:	01d7008c 	.word	0x01d7008c
+ c100344:	01d70050 	.word	0x01d70050
+ c100348:	01d7006c 	.word	0x01d7006c
+ c10034c:	01d70040 	.word	0x01d70040
+ c100350:	01d70088 	.word	0x01d70088
+ c100354:	01d70084 	.word	0x01d70084
+ c100358:	01d7007c 	.word	0x01d7007c
+ c10035c:	01d70080 	.word	0x01d70080
+ c100360:	01d70078 	.word	0x01d70078
+ c100364:	01d70074 	.word	0x01d70074
+ c100368:	01d70070 	.word	0x01d70070
+ c10036c:	01d70068 	.word	0x01d70068
+ c100370:	01d70064 	.word	0x01d70064
+ c100374:	01d70060 	.word	0x01d70060
+ c100378:	01d7005c 	.word	0x01d7005c
+ c10037c:	01d70058 	.word	0x01d70058
+ c100380:	01d70054 	.word	0x01d70054
+
+0c100384 <rtc_puttime>:
+
+void rtc_puttime( rtc_time_t *rtc_time )
+{
+ c100384:	e1a0c00d 	mov	ip, sp
+ c100388:	e92dd800 	push	{fp, ip, lr, pc}
+ c10038c:	e24cb004 	sub	fp, ip, #4
+ c100390:	e24dd008 	sub	sp, sp, #8
+ c100394:	e50b0010 	str	r0, [fp, #-16]
+    RTCCON |= (1 << 0) ;
+ c100398:	e59f3278 	ldr	r3, [pc, #632]	; c100618 <rtc_puttime+0x294>
+ c10039c:	e59f2274 	ldr	r2, [pc, #628]	; c100618 <rtc_puttime+0x294>
+ c1003a0:	e5922000 	ldr	r2, [r2]
+ c1003a4:	e3822001 	orr	r2, r2, #1
+ c1003a8:	e5832000 	str	r2, [r3]
+    
+    BCDYEAR = ((rtc_time->year/10) << 4 )| (rtc_time->year%10);
+ c1003ac:	e59f0268 	ldr	r0, [pc, #616]	; c10061c <rtc_puttime+0x298>
+ c1003b0:	e51b3010 	ldr	r3, [fp, #-16]
+ c1003b4:	e5d32006 	ldrb	r2, [r3, #6]
+ c1003b8:	e59f3260 	ldr	r3, [pc, #608]	; c100620 <rtc_puttime+0x29c>
+ c1003bc:	e0831392 	umull	r1, r3, r2, r3
+ c1003c0:	e1a031a3 	lsr	r3, r3, #3
+ c1003c4:	e20330ff 	and	r3, r3, #255	; 0xff
+ c1003c8:	e1a0c203 	lsl	ip, r3, #4
+ c1003cc:	e51b3010 	ldr	r3, [fp, #-16]
+ c1003d0:	e5d32006 	ldrb	r2, [r3, #6]
+ c1003d4:	e59f3244 	ldr	r3, [pc, #580]	; c100620 <rtc_puttime+0x29c>
+ c1003d8:	e0831392 	umull	r1, r3, r2, r3
+ c1003dc:	e1a011a3 	lsr	r1, r3, #3
+ c1003e0:	e1a03001 	mov	r3, r1
+ c1003e4:	e1a03103 	lsl	r3, r3, #2
+ c1003e8:	e0833001 	add	r3, r3, r1
+ c1003ec:	e1a03083 	lsl	r3, r3, #1
+ c1003f0:	e0633002 	rsb	r3, r3, r2
+ c1003f4:	e20330ff 	and	r3, r3, #255	; 0xff
+ c1003f8:	e18c3003 	orr	r3, ip, r3
+ c1003fc:	e5803000 	str	r3, [r0]
+    BCDMON  = ((rtc_time->mon/10) << 4 )| (rtc_time->mon%10);
+ c100400:	e59f021c 	ldr	r0, [pc, #540]	; c100624 <rtc_puttime+0x2a0>
+ c100404:	e51b3010 	ldr	r3, [fp, #-16]
+ c100408:	e5d32005 	ldrb	r2, [r3, #5]
+ c10040c:	e59f320c 	ldr	r3, [pc, #524]	; c100620 <rtc_puttime+0x29c>
+ c100410:	e0831392 	umull	r1, r3, r2, r3
+ c100414:	e1a031a3 	lsr	r3, r3, #3
+ c100418:	e20330ff 	and	r3, r3, #255	; 0xff
+ c10041c:	e1a0c203 	lsl	ip, r3, #4
+ c100420:	e51b3010 	ldr	r3, [fp, #-16]
+ c100424:	e5d32005 	ldrb	r2, [r3, #5]
+ c100428:	e59f31f0 	ldr	r3, [pc, #496]	; c100620 <rtc_puttime+0x29c>
+ c10042c:	e0831392 	umull	r1, r3, r2, r3
+ c100430:	e1a011a3 	lsr	r1, r3, #3
+ c100434:	e1a03001 	mov	r3, r1
+ c100438:	e1a03103 	lsl	r3, r3, #2
+ c10043c:	e0833001 	add	r3, r3, r1
+ c100440:	e1a03083 	lsl	r3, r3, #1
+ c100444:	e0633002 	rsb	r3, r3, r2
+ c100448:	e20330ff 	and	r3, r3, #255	; 0xff
+ c10044c:	e18c3003 	orr	r3, ip, r3
+ c100450:	e5803000 	str	r3, [r0]
+    BCDDAY  = ((rtc_time->mday/10) << 4 )| (rtc_time->mday%10);
+ c100454:	e59f01cc 	ldr	r0, [pc, #460]	; c100628 <rtc_puttime+0x2a4>
+ c100458:	e51b3010 	ldr	r3, [fp, #-16]
+ c10045c:	e5d32003 	ldrb	r2, [r3, #3]
+ c100460:	e59f31b8 	ldr	r3, [pc, #440]	; c100620 <rtc_puttime+0x29c>
+ c100464:	e0831392 	umull	r1, r3, r2, r3
+ c100468:	e1a031a3 	lsr	r3, r3, #3
+ c10046c:	e20330ff 	and	r3, r3, #255	; 0xff
+ c100470:	e1a0c203 	lsl	ip, r3, #4
+ c100474:	e51b3010 	ldr	r3, [fp, #-16]
+ c100478:	e5d32003 	ldrb	r2, [r3, #3]
+ c10047c:	e59f319c 	ldr	r3, [pc, #412]	; c100620 <rtc_puttime+0x29c>
+ c100480:	e0831392 	umull	r1, r3, r2, r3
+ c100484:	e1a011a3 	lsr	r1, r3, #3
+ c100488:	e1a03001 	mov	r3, r1
+ c10048c:	e1a03103 	lsl	r3, r3, #2
+ c100490:	e0833001 	add	r3, r3, r1
+ c100494:	e1a03083 	lsl	r3, r3, #1
+ c100498:	e0633002 	rsb	r3, r3, r2
+ c10049c:	e20330ff 	and	r3, r3, #255	; 0xff
+ c1004a0:	e18c3003 	orr	r3, ip, r3
+ c1004a4:	e5803000 	str	r3, [r0]
+    BCDDATE = ((rtc_time->wday/10) << 4 )| (rtc_time->wday%10);
+ c1004a8:	e59f017c 	ldr	r0, [pc, #380]	; c10062c <rtc_puttime+0x2a8>
+ c1004ac:	e51b3010 	ldr	r3, [fp, #-16]
+ c1004b0:	e5d32004 	ldrb	r2, [r3, #4]
+ c1004b4:	e59f3164 	ldr	r3, [pc, #356]	; c100620 <rtc_puttime+0x29c>
+ c1004b8:	e0831392 	umull	r1, r3, r2, r3
+ c1004bc:	e1a031a3 	lsr	r3, r3, #3
+ c1004c0:	e20330ff 	and	r3, r3, #255	; 0xff
+ c1004c4:	e1a0c203 	lsl	ip, r3, #4
+ c1004c8:	e51b3010 	ldr	r3, [fp, #-16]
+ c1004cc:	e5d32004 	ldrb	r2, [r3, #4]
+ c1004d0:	e59f3148 	ldr	r3, [pc, #328]	; c100620 <rtc_puttime+0x29c>
+ c1004d4:	e0831392 	umull	r1, r3, r2, r3
+ c1004d8:	e1a011a3 	lsr	r1, r3, #3
+ c1004dc:	e1a03001 	mov	r3, r1
+ c1004e0:	e1a03103 	lsl	r3, r3, #2
+ c1004e4:	e0833001 	add	r3, r3, r1
+ c1004e8:	e1a03083 	lsl	r3, r3, #1
+ c1004ec:	e0633002 	rsb	r3, r3, r2
+ c1004f0:	e20330ff 	and	r3, r3, #255	; 0xff
+ c1004f4:	e18c3003 	orr	r3, ip, r3
+ c1004f8:	e5803000 	str	r3, [r0]
+    BCDHOUR = ((rtc_time->hour/10) << 4 )| (rtc_time->hour%10);
+ c1004fc:	e59f012c 	ldr	r0, [pc, #300]	; c100630 <rtc_puttime+0x2ac>
+ c100500:	e51b3010 	ldr	r3, [fp, #-16]
+ c100504:	e5d32002 	ldrb	r2, [r3, #2]
+ c100508:	e59f3110 	ldr	r3, [pc, #272]	; c100620 <rtc_puttime+0x29c>
+ c10050c:	e0831392 	umull	r1, r3, r2, r3
+ c100510:	e1a031a3 	lsr	r3, r3, #3
+ c100514:	e20330ff 	and	r3, r3, #255	; 0xff
+ c100518:	e1a0c203 	lsl	ip, r3, #4
+ c10051c:	e51b3010 	ldr	r3, [fp, #-16]
+ c100520:	e5d32002 	ldrb	r2, [r3, #2]
+ c100524:	e59f30f4 	ldr	r3, [pc, #244]	; c100620 <rtc_puttime+0x29c>
+ c100528:	e0831392 	umull	r1, r3, r2, r3
+ c10052c:	e1a011a3 	lsr	r1, r3, #3
+ c100530:	e1a03001 	mov	r3, r1
+ c100534:	e1a03103 	lsl	r3, r3, #2
+ c100538:	e0833001 	add	r3, r3, r1
+ c10053c:	e1a03083 	lsl	r3, r3, #1
+ c100540:	e0633002 	rsb	r3, r3, r2
+ c100544:	e20330ff 	and	r3, r3, #255	; 0xff
+ c100548:	e18c3003 	orr	r3, ip, r3
+ c10054c:	e5803000 	str	r3, [r0]
+    BCDMIN  = ((rtc_time->min/10) << 4 )| (rtc_time->min%10);
+ c100550:	e59f00dc 	ldr	r0, [pc, #220]	; c100634 <rtc_puttime+0x2b0>
+ c100554:	e51b3010 	ldr	r3, [fp, #-16]
+ c100558:	e5d32001 	ldrb	r2, [r3, #1]
+ c10055c:	e59f30bc 	ldr	r3, [pc, #188]	; c100620 <rtc_puttime+0x29c>
+ c100560:	e0831392 	umull	r1, r3, r2, r3
+ c100564:	e1a031a3 	lsr	r3, r3, #3
+ c100568:	e20330ff 	and	r3, r3, #255	; 0xff
+ c10056c:	e1a0c203 	lsl	ip, r3, #4
+ c100570:	e51b3010 	ldr	r3, [fp, #-16]
+ c100574:	e5d32001 	ldrb	r2, [r3, #1]
+ c100578:	e59f30a0 	ldr	r3, [pc, #160]	; c100620 <rtc_puttime+0x29c>
+ c10057c:	e0831392 	umull	r1, r3, r2, r3
+ c100580:	e1a011a3 	lsr	r1, r3, #3
+ c100584:	e1a03001 	mov	r3, r1
+ c100588:	e1a03103 	lsl	r3, r3, #2
+ c10058c:	e0833001 	add	r3, r3, r1
+ c100590:	e1a03083 	lsl	r3, r3, #1
+ c100594:	e0633002 	rsb	r3, r3, r2
+ c100598:	e20330ff 	and	r3, r3, #255	; 0xff
+ c10059c:	e18c3003 	orr	r3, ip, r3
+ c1005a0:	e5803000 	str	r3, [r0]
+    BCDSEC  = ((rtc_time->sec/10) << 4 )| (rtc_time->sec%10);
+ c1005a4:	e59f008c 	ldr	r0, [pc, #140]	; c100638 <rtc_puttime+0x2b4>
+ c1005a8:	e51b3010 	ldr	r3, [fp, #-16]
+ c1005ac:	e5d32000 	ldrb	r2, [r3]
+ c1005b0:	e59f3068 	ldr	r3, [pc, #104]	; c100620 <rtc_puttime+0x29c>
+ c1005b4:	e0831392 	umull	r1, r3, r2, r3
+ c1005b8:	e1a031a3 	lsr	r3, r3, #3
+ c1005bc:	e20330ff 	and	r3, r3, #255	; 0xff
+ c1005c0:	e1a0c203 	lsl	ip, r3, #4
+ c1005c4:	e51b3010 	ldr	r3, [fp, #-16]
+ c1005c8:	e5d32000 	ldrb	r2, [r3]
+ c1005cc:	e59f304c 	ldr	r3, [pc, #76]	; c100620 <rtc_puttime+0x29c>
+ c1005d0:	e0831392 	umull	r1, r3, r2, r3
+ c1005d4:	e1a011a3 	lsr	r1, r3, #3
+ c1005d8:	e1a03001 	mov	r3, r1
+ c1005dc:	e1a03103 	lsl	r3, r3, #2
+ c1005e0:	e0833001 	add	r3, r3, r1
+ c1005e4:	e1a03083 	lsl	r3, r3, #1
+ c1005e8:	e0633002 	rsb	r3, r3, r2
+ c1005ec:	e20330ff 	and	r3, r3, #255	; 0xff
+ c1005f0:	e18c3003 	orr	r3, ip, r3
+ c1005f4:	e5803000 	str	r3, [r0]
+        
+    RTCCON &= ~(1 << 0);
+ c1005f8:	e59f3018 	ldr	r3, [pc, #24]	; c100618 <rtc_puttime+0x294>
+ c1005fc:	e59f2014 	ldr	r2, [pc, #20]	; c100618 <rtc_puttime+0x294>
+ c100600:	e5922000 	ldr	r2, [r2]
+ c100604:	e3c22001 	bic	r2, r2, #1
+ c100608:	e5832000 	str	r2, [r3]
+}
+ c10060c:	e24bd00c 	sub	sp, fp, #12
+ c100610:	e89d6800 	ldm	sp, {fp, sp, lr}
+ c100614:	e12fff1e 	bx	lr
+ c100618:	01d70040 	.word	0x01d70040
+ c10061c:	01d70088 	.word	0x01d70088
+ c100620:	cccccccd 	.word	0xcccccccd
+ c100624:	01d70084 	.word	0x01d70084
+ c100628:	01d7007c 	.word	0x01d7007c
+ c10062c:	01d70080 	.word	0x01d70080
+ c100630:	01d70078 	.word	0x01d70078
+ c100634:	01d70074 	.word	0x01d70074
+ c100638:	01d70070 	.word	0x01d70070
+
+0c10063c <rtc_gettime>:
+
+void rtc_gettime( rtc_time_t *rtc_time )
+{
+ c10063c:	e1a0c00d 	mov	ip, sp
+ c100640:	e92dd800 	push	{fp, ip, lr, pc}
+ c100644:	e24cb004 	sub	fp, ip, #4
+ c100648:	e24dd008 	sub	sp, sp, #8
+ c10064c:	e50b0010 	str	r0, [fp, #-16]
+    RTCCON |= (1 << 0);
+ c100650:	e59f32c0 	ldr	r3, [pc, #704]	; c100918 <rtc_gettime+0x2dc>
+ c100654:	e59f22bc 	ldr	r2, [pc, #700]	; c100918 <rtc_gettime+0x2dc>
+ c100658:	e5922000 	ldr	r2, [r2]
+ c10065c:	e3822001 	orr	r2, r2, #1
+ c100660:	e5832000 	str	r2, [r3]
+    
+    rtc_time->year = ((BCDYEAR >> 4 ) * 10 ) + (BCDYEAR & (0xF) );
+ c100664:	e59f32b0 	ldr	r3, [pc, #688]	; c10091c <rtc_gettime+0x2e0>
+ c100668:	e5933000 	ldr	r3, [r3]
+ c10066c:	e1a03223 	lsr	r3, r3, #4
+ c100670:	e20330ff 	and	r3, r3, #255	; 0xff
+ c100674:	e1a02003 	mov	r2, r3
+ c100678:	e1a02102 	lsl	r2, r2, #2
+ c10067c:	e0823003 	add	r3, r2, r3
+ c100680:	e1a03083 	lsl	r3, r3, #1
+ c100684:	e20320ff 	and	r2, r3, #255	; 0xff
+ c100688:	e59f328c 	ldr	r3, [pc, #652]	; c10091c <rtc_gettime+0x2e0>
+ c10068c:	e5933000 	ldr	r3, [r3]
+ c100690:	e20330ff 	and	r3, r3, #255	; 0xff
+ c100694:	e203300f 	and	r3, r3, #15
+ c100698:	e20330ff 	and	r3, r3, #255	; 0xff
+ c10069c:	e0823003 	add	r3, r2, r3
+ c1006a0:	e20320ff 	and	r2, r3, #255	; 0xff
+ c1006a4:	e51b3010 	ldr	r3, [fp, #-16]
+ c1006a8:	e5c32006 	strb	r2, [r3, #6]
+    rtc_time->mon  = ((BCDMON >> 4 ) * 10 ) + (BCDMON & (0xF) );
+ c1006ac:	e59f326c 	ldr	r3, [pc, #620]	; c100920 <rtc_gettime+0x2e4>
+ c1006b0:	e5933000 	ldr	r3, [r3]
+ c1006b4:	e1a03223 	lsr	r3, r3, #4
+ c1006b8:	e20330ff 	and	r3, r3, #255	; 0xff
+ c1006bc:	e1a02003 	mov	r2, r3
+ c1006c0:	e1a02102 	lsl	r2, r2, #2
+ c1006c4:	e0823003 	add	r3, r2, r3
+ c1006c8:	e1a03083 	lsl	r3, r3, #1
+ c1006cc:	e20320ff 	and	r2, r3, #255	; 0xff
+ c1006d0:	e59f3248 	ldr	r3, [pc, #584]	; c100920 <rtc_gettime+0x2e4>
+ c1006d4:	e5933000 	ldr	r3, [r3]
+ c1006d8:	e20330ff 	and	r3, r3, #255	; 0xff
+ c1006dc:	e203300f 	and	r3, r3, #15
+ c1006e0:	e20330ff 	and	r3, r3, #255	; 0xff
+ c1006e4:	e0823003 	add	r3, r2, r3
+ c1006e8:	e20320ff 	and	r2, r3, #255	; 0xff
+ c1006ec:	e51b3010 	ldr	r3, [fp, #-16]
+ c1006f0:	e5c32005 	strb	r2, [r3, #5]
+    rtc_time->mday = ((BCDDAY >> 4 ) * 10 ) + (BCDDAY & (0xF) );
+ c1006f4:	e59f3228 	ldr	r3, [pc, #552]	; c100924 <rtc_gettime+0x2e8>
+ c1006f8:	e5933000 	ldr	r3, [r3]
+ c1006fc:	e1a03223 	lsr	r3, r3, #4
+ c100700:	e20330ff 	and	r3, r3, #255	; 0xff
+ c100704:	e1a02003 	mov	r2, r3
+ c100708:	e1a02102 	lsl	r2, r2, #2
+ c10070c:	e0823003 	add	r3, r2, r3
+ c100710:	e1a03083 	lsl	r3, r3, #1
+ c100714:	e20320ff 	and	r2, r3, #255	; 0xff
+ c100718:	e59f3204 	ldr	r3, [pc, #516]	; c100924 <rtc_gettime+0x2e8>
+ c10071c:	e5933000 	ldr	r3, [r3]
+ c100720:	e20330ff 	and	r3, r3, #255	; 0xff
+ c100724:	e203300f 	and	r3, r3, #15
+ c100728:	e20330ff 	and	r3, r3, #255	; 0xff
+ c10072c:	e0823003 	add	r3, r2, r3
+ c100730:	e20320ff 	and	r2, r3, #255	; 0xff
+ c100734:	e51b3010 	ldr	r3, [fp, #-16]
+ c100738:	e5c32003 	strb	r2, [r3, #3]
+    rtc_time->wday = ((BCDDATE >> 4 ) * 10 ) + (BCDDATE & (0xF) );
+ c10073c:	e59f31e4 	ldr	r3, [pc, #484]	; c100928 <rtc_gettime+0x2ec>
+ c100740:	e5933000 	ldr	r3, [r3]
+ c100744:	e1a03223 	lsr	r3, r3, #4
+ c100748:	e20330ff 	and	r3, r3, #255	; 0xff
+ c10074c:	e1a02003 	mov	r2, r3
+ c100750:	e1a02102 	lsl	r2, r2, #2
+ c100754:	e0823003 	add	r3, r2, r3
+ c100758:	e1a03083 	lsl	r3, r3, #1
+ c10075c:	e20320ff 	and	r2, r3, #255	; 0xff
+ c100760:	e59f31c0 	ldr	r3, [pc, #448]	; c100928 <rtc_gettime+0x2ec>
+ c100764:	e5933000 	ldr	r3, [r3]
+ c100768:	e20330ff 	and	r3, r3, #255	; 0xff
+ c10076c:	e203300f 	and	r3, r3, #15
+ c100770:	e20330ff 	and	r3, r3, #255	; 0xff
+ c100774:	e0823003 	add	r3, r2, r3
+ c100778:	e20320ff 	and	r2, r3, #255	; 0xff
+ c10077c:	e51b3010 	ldr	r3, [fp, #-16]
+ c100780:	e5c32004 	strb	r2, [r3, #4]
+    rtc_time->hour = ((BCDHOUR >> 4 ) * 10 ) + (BCDHOUR & (0xF) );
+ c100784:	e59f31a0 	ldr	r3, [pc, #416]	; c10092c <rtc_gettime+0x2f0>
+ c100788:	e5933000 	ldr	r3, [r3]
+ c10078c:	e1a03223 	lsr	r3, r3, #4
+ c100790:	e20330ff 	and	r3, r3, #255	; 0xff
+ c100794:	e1a02003 	mov	r2, r3
+ c100798:	e1a02102 	lsl	r2, r2, #2
+ c10079c:	e0823003 	add	r3, r2, r3
+ c1007a0:	e1a03083 	lsl	r3, r3, #1
+ c1007a4:	e20320ff 	and	r2, r3, #255	; 0xff
+ c1007a8:	e59f317c 	ldr	r3, [pc, #380]	; c10092c <rtc_gettime+0x2f0>
+ c1007ac:	e5933000 	ldr	r3, [r3]
+ c1007b0:	e20330ff 	and	r3, r3, #255	; 0xff
+ c1007b4:	e203300f 	and	r3, r3, #15
+ c1007b8:	e20330ff 	and	r3, r3, #255	; 0xff
+ c1007bc:	e0823003 	add	r3, r2, r3
+ c1007c0:	e20320ff 	and	r2, r3, #255	; 0xff
+ c1007c4:	e51b3010 	ldr	r3, [fp, #-16]
+ c1007c8:	e5c32002 	strb	r2, [r3, #2]
+    rtc_time->min  = ((BCDMIN >> 4 ) * 10 ) + (BCDMIN & (0xF) );
+ c1007cc:	e59f315c 	ldr	r3, [pc, #348]	; c100930 <rtc_gettime+0x2f4>
+ c1007d0:	e5933000 	ldr	r3, [r3]
+ c1007d4:	e1a03223 	lsr	r3, r3, #4
+ c1007d8:	e20330ff 	and	r3, r3, #255	; 0xff
+ c1007dc:	e1a02003 	mov	r2, r3
+ c1007e0:	e1a02102 	lsl	r2, r2, #2
+ c1007e4:	e0823003 	add	r3, r2, r3
+ c1007e8:	e1a03083 	lsl	r3, r3, #1
+ c1007ec:	e20320ff 	and	r2, r3, #255	; 0xff
+ c1007f0:	e59f3138 	ldr	r3, [pc, #312]	; c100930 <rtc_gettime+0x2f4>
+ c1007f4:	e5933000 	ldr	r3, [r3]
+ c1007f8:	e20330ff 	and	r3, r3, #255	; 0xff
+ c1007fc:	e203300f 	and	r3, r3, #15
+ c100800:	e20330ff 	and	r3, r3, #255	; 0xff
+ c100804:	e0823003 	add	r3, r2, r3
+ c100808:	e20320ff 	and	r2, r3, #255	; 0xff
+ c10080c:	e51b3010 	ldr	r3, [fp, #-16]
+ c100810:	e5c32001 	strb	r2, [r3, #1]
+    rtc_time->sec  = ((BCDSEC >> 4 ) * 10 ) + (BCDSEC & (0xF) );
+ c100814:	e59f3118 	ldr	r3, [pc, #280]	; c100934 <rtc_gettime+0x2f8>
+ c100818:	e5933000 	ldr	r3, [r3]
+ c10081c:	e1a03223 	lsr	r3, r3, #4
+ c100820:	e20330ff 	and	r3, r3, #255	; 0xff
+ c100824:	e1a02003 	mov	r2, r3
+ c100828:	e1a02102 	lsl	r2, r2, #2
+ c10082c:	e0823003 	add	r3, r2, r3
+ c100830:	e1a03083 	lsl	r3, r3, #1
+ c100834:	e20320ff 	and	r2, r3, #255	; 0xff
+ c100838:	e59f30f4 	ldr	r3, [pc, #244]	; c100934 <rtc_gettime+0x2f8>
+ c10083c:	e5933000 	ldr	r3, [r3]
+ c100840:	e20330ff 	and	r3, r3, #255	; 0xff
+ c100844:	e203300f 	and	r3, r3, #15
+ c100848:	e20330ff 	and	r3, r3, #255	; 0xff
+ c10084c:	e0823003 	add	r3, r2, r3
+ c100850:	e20320ff 	and	r2, r3, #255	; 0xff
+ c100854:	e51b3010 	ldr	r3, [fp, #-16]
+ c100858:	e5c32000 	strb	r2, [r3]
+    if( ! rtc_time->sec ){
+ c10085c:	e51b3010 	ldr	r3, [fp, #-16]
+ c100860:	e5d33000 	ldrb	r3, [r3]
+ c100864:	e3530000 	cmp	r3, #0
+ c100868:	1a000022 	bne	c1008f8 <rtc_gettime+0x2bc>
+        rtc_time->year = BCDYEAR;
+ c10086c:	e59f30a8 	ldr	r3, [pc, #168]	; c10091c <rtc_gettime+0x2e0>
+ c100870:	e5933000 	ldr	r3, [r3]
+ c100874:	e20320ff 	and	r2, r3, #255	; 0xff
+ c100878:	e51b3010 	ldr	r3, [fp, #-16]
+ c10087c:	e5c32006 	strb	r2, [r3, #6]
+        rtc_time->mon  = BCDMON;
+ c100880:	e59f3098 	ldr	r3, [pc, #152]	; c100920 <rtc_gettime+0x2e4>
+ c100884:	e5933000 	ldr	r3, [r3]
+ c100888:	e20320ff 	and	r2, r3, #255	; 0xff
+ c10088c:	e51b3010 	ldr	r3, [fp, #-16]
+ c100890:	e5c32005 	strb	r2, [r3, #5]
+        rtc_time->mday = BCDDAY;
+ c100894:	e59f3088 	ldr	r3, [pc, #136]	; c100924 <rtc_gettime+0x2e8>
+ c100898:	e5933000 	ldr	r3, [r3]
+ c10089c:	e20320ff 	and	r2, r3, #255	; 0xff
+ c1008a0:	e51b3010 	ldr	r3, [fp, #-16]
+ c1008a4:	e5c32003 	strb	r2, [r3, #3]
+        rtc_time->wday = BCDDATE;
+ c1008a8:	e59f3078 	ldr	r3, [pc, #120]	; c100928 <rtc_gettime+0x2ec>
+ c1008ac:	e5933000 	ldr	r3, [r3]
+ c1008b0:	e20320ff 	and	r2, r3, #255	; 0xff
+ c1008b4:	e51b3010 	ldr	r3, [fp, #-16]
+ c1008b8:	e5c32004 	strb	r2, [r3, #4]
+        rtc_time->hour = BCDHOUR;
+ c1008bc:	e59f3068 	ldr	r3, [pc, #104]	; c10092c <rtc_gettime+0x2f0>
+ c1008c0:	e5933000 	ldr	r3, [r3]
+ c1008c4:	e20320ff 	and	r2, r3, #255	; 0xff
+ c1008c8:	e51b3010 	ldr	r3, [fp, #-16]
+ c1008cc:	e5c32002 	strb	r2, [r3, #2]
+        rtc_time->min  = BCDMIN;
+ c1008d0:	e59f3058 	ldr	r3, [pc, #88]	; c100930 <rtc_gettime+0x2f4>
+ c1008d4:	e5933000 	ldr	r3, [r3]
+ c1008d8:	e20320ff 	and	r2, r3, #255	; 0xff
+ c1008dc:	e51b3010 	ldr	r3, [fp, #-16]
+ c1008e0:	e5c32001 	strb	r2, [r3, #1]
+        rtc_time->sec  = BCDSEC;
+ c1008e4:	e59f3048 	ldr	r3, [pc, #72]	; c100934 <rtc_gettime+0x2f8>
+ c1008e8:	e5933000 	ldr	r3, [r3]
+ c1008ec:	e20320ff 	and	r2, r3, #255	; 0xff
+ c1008f0:	e51b3010 	ldr	r3, [fp, #-16]
+ c1008f4:	e5c32000 	strb	r2, [r3]
+    };
+
+    RTCCON &= ~(1 << 0);
+ c1008f8:	e59f3018 	ldr	r3, [pc, #24]	; c100918 <rtc_gettime+0x2dc>
+ c1008fc:	e59f2014 	ldr	r2, [pc, #20]	; c100918 <rtc_gettime+0x2dc>
+ c100900:	e5922000 	ldr	r2, [r2]
+ c100904:	e3c22001 	bic	r2, r2, #1
+ c100908:	e5832000 	str	r2, [r3]
+}
+ c10090c:	e24bd00c 	sub	sp, fp, #12
+ c100910:	e89d6800 	ldm	sp, {fp, sp, lr}
+ c100914:	e12fff1e 	bx	lr
+ c100918:	01d70040 	.word	0x01d70040
+ c10091c:	01d70088 	.word	0x01d70088
+ c100920:	01d70084 	.word	0x01d70084
+ c100924:	01d7007c 	.word	0x01d7007c
+ c100928:	01d70080 	.word	0x01d70080
+ c10092c:	01d70078 	.word	0x01d70078
+ c100930:	01d70074 	.word	0x01d70074
+ c100934:	01d70070 	.word	0x01d70070
+
+0c100938 <rtc_open>:
+
+
+void rtc_open( void (*isr)(void), uint8 tick_count )
+{
+ c100938:	e1a0c00d 	mov	ip, sp
+ c10093c:	e92dd800 	push	{fp, ip, lr, pc}
+ c100940:	e24cb004 	sub	fp, ip, #4
+ c100944:	e24dd008 	sub	sp, sp, #8
+ c100948:	e50b0010 	str	r0, [fp, #-16]
+ c10094c:	e1a03001 	mov	r3, r1
+ c100950:	e54b3011 	strb	r3, [fp, #-17]	; 0xffffffef
+    pISR_TICK = (uint32) isr;
+ c100954:	e59f3048 	ldr	r3, [pc, #72]	; c1009a4 <rtc_open+0x6c>
+ c100958:	e51b2010 	ldr	r2, [fp, #-16]
+ c10095c:	e5832000 	str	r2, [r3]
+    I_ISPC    = BIT_TICK;
+ c100960:	e59f3040 	ldr	r3, [pc, #64]	; c1009a8 <rtc_open+0x70>
+ c100964:	e3a02601 	mov	r2, #1048576	; 0x100000
+ c100968:	e5832000 	str	r2, [r3]
+    INTMSK   &= ~(BIT_GLOBAL | BIT_TICK);
+ c10096c:	e59f3038 	ldr	r3, [pc, #56]	; c1009ac <rtc_open+0x74>
+ c100970:	e59f2034 	ldr	r2, [pc, #52]	; c1009ac <rtc_open+0x74>
+ c100974:	e5922000 	ldr	r2, [r2]
+ c100978:	e3c22641 	bic	r2, r2, #68157440	; 0x4100000
+ c10097c:	e5832000 	str	r2, [r3]
+    TICNT     = (1 << 7) | tick_count;
+ c100980:	e59f2028 	ldr	r2, [pc, #40]	; c1009b0 <rtc_open+0x78>
+ c100984:	e55b3011 	ldrb	r3, [fp, #-17]	; 0xffffffef
+ c100988:	e1e03c83 	mvn	r3, r3, lsl #25
+ c10098c:	e1e03ca3 	mvn	r3, r3, lsr #25
+ c100990:	e20330ff 	and	r3, r3, #255	; 0xff
+ c100994:	e5823000 	str	r3, [r2]
+}
+ c100998:	e24bd00c 	sub	sp, fp, #12
+ c10099c:	e89d6800 	ldm	sp, {fp, sp, lr}
+ c1009a0:	e12fff1e 	bx	lr
+ c1009a4:	0c7fff70 	.word	0x0c7fff70
+ c1009a8:	01e00024 	.word	0x01e00024
+ c1009ac:	01e0000c 	.word	0x01e0000c
+ c1009b0:	01d7008c 	.word	0x01d7008c
+
+0c1009b4 <rtc_close>:
+
+void rtc_close( void )
+{
+ c1009b4:	e1a0c00d 	mov	ip, sp
+ c1009b8:	e92dd800 	push	{fp, ip, lr, pc}
+ c1009bc:	e24cb004 	sub	fp, ip, #4
+    TICNT     = 0;  
+ c1009c0:	e59f3030 	ldr	r3, [pc, #48]	; c1009f8 <rtc_close+0x44>
+ c1009c4:	e3a02000 	mov	r2, #0
+ c1009c8:	e5832000 	str	r2, [r3]
+    INTMSK   |= BIT_TICK ;    
+ c1009cc:	e59f3028 	ldr	r3, [pc, #40]	; c1009fc <rtc_close+0x48>
+ c1009d0:	e59f2024 	ldr	r2, [pc, #36]	; c1009fc <rtc_close+0x48>
+ c1009d4:	e5922000 	ldr	r2, [r2]
+ c1009d8:	e3822601 	orr	r2, r2, #1048576	; 0x100000
+ c1009dc:	e5832000 	str	r2, [r3]
+    pISR_TICK = (uint32) isr_TICK_dummy ;
+ c1009e0:	e59f3018 	ldr	r3, [pc, #24]	; c100a00 <rtc_close+0x4c>
+ c1009e4:	e59f2018 	ldr	r2, [pc, #24]	; c100a04 <rtc_close+0x50>
+ c1009e8:	e5832000 	str	r2, [r3]
+}
+ c1009ec:	e24bd00c 	sub	sp, fp, #12
+ c1009f0:	e89d6800 	ldm	sp, {fp, sp, lr}
+ c1009f4:	e12fff1e 	bx	lr
+ c1009f8:	01d7008c 	.word	0x01d7008c
+ c1009fc:	01e0000c 	.word	0x01e0000c
+ c100a00:	0c7fff70 	.word	0x0c7fff70
+ c100a04:	0c10118c 	.word	0x0c10118c
+
+0c100a08 <sys_init>:
+void isr_TS_dummy( void )		__attribute__ ((interrupt ("IRQ")));
+void isr_KEYPAD_dummy( void )	__attribute__ ((interrupt ("IRQ")));
+void isr_USB_dummy( void )       __attribute__ ((interrupt ("IRQ")));
+
+void sys_init( void )
+{
+ c100a08:	e1a0c00d 	mov	ip, sp
+ c100a0c:	e92dd800 	push	{fp, ip, lr, pc}
+ c100a10:	e24cb004 	sub	fp, ip, #4
+    WTCON  = 0;    
+ c100a14:	e59f3104 	ldr	r3, [pc, #260]	; c100b20 <sys_init+0x118>
+ c100a18:	e3a02000 	mov	r2, #0
+ c100a1c:	e5832000 	str	r2, [r3]
+    INTMSK = ~0;
+ c100a20:	e59f30fc 	ldr	r3, [pc, #252]	; c100b24 <sys_init+0x11c>
+ c100a24:	e3e02000 	mvn	r2, #0
+ c100a28:	e5832000 	str	r2, [r3]
+
+    
+     WTCON  = 0;
+ c100a2c:	e59f30ec 	ldr	r3, [pc, #236]	; c100b20 <sys_init+0x118>
+ c100a30:	e3a02000 	mov	r2, #0
+ c100a34:	e5832000 	str	r2, [r3]
+     INTMSK = ~0;
+ c100a38:	e59f30e4 	ldr	r3, [pc, #228]	; c100b24 <sys_init+0x11c>
+ c100a3c:	e3e02000 	mvn	r2, #0
+ c100a40:	e5832000 	str	r2, [r3]
+
+     LOCKTIME = 0xFFF;
+ c100a44:	e59f30dc 	ldr	r3, [pc, #220]	; c100b28 <sys_init+0x120>
+ c100a48:	e59f20dc 	ldr	r2, [pc, #220]	; c100b2c <sys_init+0x124>
+ c100a4c:	e5832000 	str	r2, [r3]
+     PLLCON   = 0x38021;
+ c100a50:	e3a03776 	mov	r3, #30932992	; 0x1d80000
+ c100a54:	e59f20d4 	ldr	r2, [pc, #212]	; c100b30 <sys_init+0x128>
+ c100a58:	e5832000 	str	r2, [r3]
+     CLKSLOW  = 0x8;
+ c100a5c:	e59f30d0 	ldr	r3, [pc, #208]	; c100b34 <sys_init+0x12c>
+ c100a60:	e3a02008 	mov	r2, #8
+ c100a64:	e5832000 	str	r2, [r3]
+     CLKCON   = 0x7FF8;
+ c100a68:	e59f30c8 	ldr	r3, [pc, #200]	; c100b38 <sys_init+0x130>
+ c100a6c:	e59f20c8 	ldr	r2, [pc, #200]	; c100b3c <sys_init+0x134>
+ c100a70:	e5832000 	str	r2, [r3]
+
+     SBUSCON = 0x8000001B;
+ c100a74:	e3a03771 	mov	r3, #29622272	; 0x1c40000
+ c100a78:	e3a0216e 	mov	r2, #-2147483621	; 0x8000001b
+ c100a7c:	e5832000 	str	r2, [r3]
+
+     SYSCFG = 0x0;
+ c100a80:	e3a03507 	mov	r3, #29360128	; 0x1c00000
+ c100a84:	e3a02000 	mov	r2, #0
+ c100a88:	e5832000 	str	r2, [r3]
+
+    I_PMST = 0x1F1B;
+ c100a8c:	e59f30ac 	ldr	r3, [pc, #172]	; c100b40 <sys_init+0x138>
+ c100a90:	e59f20ac 	ldr	r2, [pc, #172]	; c100b44 <sys_init+0x13c>
+ c100a94:	e5832000 	str	r2, [r3]
+    I_PSLV = 0x1B1B1B1B;
+ c100a98:	e59f30a8 	ldr	r3, [pc, #168]	; c100b48 <sys_init+0x140>
+ c100a9c:	e59f20a8 	ldr	r2, [pc, #168]	; c100b4c <sys_init+0x144>
+ c100aa0:	e5832000 	str	r2, [r3]
+    INTMOD = 0x0;
+ c100aa4:	e59f30a4 	ldr	r3, [pc, #164]	; c100b50 <sys_init+0x148>
+ c100aa8:	e3a02000 	mov	r2, #0
+ c100aac:	e5832000 	str	r2, [r3]
+    install_dummy_isr();
+ c100ab0:	eb00008c 	bl	c100ce8 <install_dummy_isr>
+    EXTINTPND = 0x1;
+ c100ab4:	e59f3098 	ldr	r3, [pc, #152]	; c100b54 <sys_init+0x14c>
+ c100ab8:	e3a02001 	mov	r2, #1
+ c100abc:	e5832000 	str	r2, [r3]
+    I_ISPC = 0x0; //0 dependen del numero de interrupciones
+ c100ac0:	e59f3090 	ldr	r3, [pc, #144]	; c100b58 <sys_init+0x150>
+ c100ac4:	e3a02000 	mov	r2, #0
+ c100ac8:	e5832000 	str	r2, [r3]
+    INTCON = 0x1;
+ c100acc:	e3a0361e 	mov	r3, #31457280	; 0x1e00000
+ c100ad0:	e3a02001 	mov	r2, #1
+ c100ad4:	e5832000 	str	r2, [r3]
+
+    SET_OPMODE( SVCMODE );
+ c100ad8:	e10f0000 	mrs	r0, CPSR
+ c100adc:	e3c0001f 	bic	r0, r0, #31
+ c100ae0:	e3800013 	orr	r0, r0, #19
+ c100ae4:	e121f000 	msr	CPSR_c, r0
+    SET_IRQFLAG( 0 );
+ c100ae8:	e10f0000 	mrs	r0, CPSR
+ c100aec:	e3c00080 	bic	r0, r0, #128	; 0x80
+ c100af0:	e3800000 	orr	r0, r0, #0
+ c100af4:	e121f000 	msr	CPSR_c, r0
+    SET_FIQFLAG( 1 );
+ c100af8:	e10f0000 	mrs	r0, CPSR
+ c100afc:	e3c00040 	bic	r0, r0, #64	; 0x40
+ c100b00:	e3800040 	orr	r0, r0, #64	; 0x40
+ c100b04:	e121f000 	msr	CPSR_c, r0
+
+    port_init();
+ c100b08:	eb000013 	bl	c100b5c <port_init>
+    uart0_init();
+ c100b0c:	eb0001f5 	bl	c1012e8 <uart0_init>
+
+    show_sys_info();
+ c100b10:	eb0001df 	bl	c101294 <show_sys_info>
+}
+ c100b14:	e24bd00c 	sub	sp, fp, #12
+ c100b18:	e89d6800 	ldm	sp, {fp, sp, lr}
+ c100b1c:	e12fff1e 	bx	lr
+ c100b20:	01d30000 	.word	0x01d30000
+ c100b24:	01e0000c 	.word	0x01e0000c
+ c100b28:	01d8000c 	.word	0x01d8000c
+ c100b2c:	00000fff 	.word	0x00000fff
+ c100b30:	00038021 	.word	0x00038021
+ c100b34:	01d80008 	.word	0x01d80008
+ c100b38:	01d80004 	.word	0x01d80004
+ c100b3c:	00007ff8 	.word	0x00007ff8
+ c100b40:	01e00014 	.word	0x01e00014
+ c100b44:	00001f1b 	.word	0x00001f1b
+ c100b48:	01e00010 	.word	0x01e00010
+ c100b4c:	1b1b1b1b 	.word	0x1b1b1b1b
+ c100b50:	01e00008 	.word	0x01e00008
+ c100b54:	01d20054 	.word	0x01d20054
+ c100b58:	01e00024 	.word	0x01e00024
+
+0c100b5c <port_init>:
+
+static void port_init( void )
+{
+ c100b5c:	e1a0c00d 	mov	ip, sp
+ c100b60:	e92dd800 	push	{fp, ip, lr, pc}
+ c100b64:	e24cb004 	sub	fp, ip, #4
+     PDATA = ~0;
+ c100b68:	e59f3100 	ldr	r3, [pc, #256]	; c100c70 <port_init+0x114>
+ c100b6c:	e3e02000 	mvn	r2, #0
+ c100b70:	e5832000 	str	r2, [r3]
+    PCONA = 0xFE;
+ c100b74:	e59f30f8 	ldr	r3, [pc, #248]	; c100c74 <port_init+0x118>
+ c100b78:	e3a020fe 	mov	r2, #254	; 0xfe
+ c100b7c:	e5832000 	str	r2, [r3]
+
+    PDATB = ~0;
+ c100b80:	e59f30f0 	ldr	r3, [pc, #240]	; c100c78 <port_init+0x11c>
+ c100b84:	e3e02000 	mvn	r2, #0
+ c100b88:	e5832000 	str	r2, [r3]
+    PCONB = 0x14F;
+ c100b8c:	e59f30e8 	ldr	r3, [pc, #232]	; c100c7c <port_init+0x120>
+ c100b90:	e59f20e8 	ldr	r2, [pc, #232]	; c100c80 <port_init+0x124>
+ c100b94:	e5832000 	str	r2, [r3]
+
+    PDATC = ~0;
+ c100b98:	e59f30e4 	ldr	r3, [pc, #228]	; c100c84 <port_init+0x128>
+ c100b9c:	e3e02000 	mvn	r2, #0
+ c100ba0:	e5832000 	str	r2, [r3]
+    PCONC = 0x5FF555FF;
+ c100ba4:	e59f30dc 	ldr	r3, [pc, #220]	; c100c88 <port_init+0x12c>
+ c100ba8:	e59f20dc 	ldr	r2, [pc, #220]	; c100c8c <port_init+0x130>
+ c100bac:	e5832000 	str	r2, [r3]
+    PUPC  = 0x94FB;
+ c100bb0:	e59f30d8 	ldr	r3, [pc, #216]	; c100c90 <port_init+0x134>
+ c100bb4:	e59f20d8 	ldr	r2, [pc, #216]	; c100c94 <port_init+0x138>
+ c100bb8:	e5832000 	str	r2, [r3]
+
+    PDATD = ~0;
+ c100bbc:	e59f30d4 	ldr	r3, [pc, #212]	; c100c98 <port_init+0x13c>
+ c100bc0:	e3e02000 	mvn	r2, #0
+ c100bc4:	e5832000 	str	r2, [r3]
+    PCOND = 0xAAAA;
+ c100bc8:	e59f30cc 	ldr	r3, [pc, #204]	; c100c9c <port_init+0x140>
+ c100bcc:	e59f20cc 	ldr	r2, [pc, #204]	; c100ca0 <port_init+0x144>
+ c100bd0:	e5832000 	str	r2, [r3]
+    PUPD  = 0xFF;
+ c100bd4:	e59f30c8 	ldr	r3, [pc, #200]	; c100ca4 <port_init+0x148>
+ c100bd8:	e3a020ff 	mov	r2, #255	; 0xff
+ c100bdc:	e5832000 	str	r2, [r3]
+    
+    PDATE = ~0;
+ c100be0:	e59f30c0 	ldr	r3, [pc, #192]	; c100ca8 <port_init+0x14c>
+ c100be4:	e3e02000 	mvn	r2, #0
+ c100be8:	e5832000 	str	r2, [r3]
+    PCONE = 0x255A9;
+ c100bec:	e59f30b8 	ldr	r3, [pc, #184]	; c100cac <port_init+0x150>
+ c100bf0:	e59f20b8 	ldr	r2, [pc, #184]	; c100cb0 <port_init+0x154>
+ c100bf4:	e5832000 	str	r2, [r3]
+    PUPE  = 0x1FB;
+ c100bf8:	e59f30b4 	ldr	r3, [pc, #180]	; c100cb4 <port_init+0x158>
+ c100bfc:	e59f20b4 	ldr	r2, [pc, #180]	; c100cb8 <port_init+0x15c>
+ c100c00:	e5832000 	str	r2, [r3]
+
+    PDATF = ~0;
+ c100c04:	e59f30b0 	ldr	r3, [pc, #176]	; c100cbc <port_init+0x160>
+ c100c08:	e3e02000 	mvn	r2, #0
+ c100c0c:	e5832000 	str	r2, [r3]
+    PCONF = 0x251A;
+ c100c10:	e59f30a8 	ldr	r3, [pc, #168]	; c100cc0 <port_init+0x164>
+ c100c14:	e59f20a8 	ldr	r2, [pc, #168]	; c100cc4 <port_init+0x168>
+ c100c18:	e5832000 	str	r2, [r3]
+    PUPF  = 0x74;
+ c100c1c:	e59f30a4 	ldr	r3, [pc, #164]	; c100cc8 <port_init+0x16c>
+ c100c20:	e3a02074 	mov	r2, #116	; 0x74
+ c100c24:	e5832000 	str	r2, [r3]
+    
+    PDATG = ~0;
+ c100c28:	e59f309c 	ldr	r3, [pc, #156]	; c100ccc <port_init+0x170>
+ c100c2c:	e3e02000 	mvn	r2, #0
+ c100c30:	e5832000 	str	r2, [r3]
+    PCONG = 0xF5FF;
+ c100c34:	e59f3094 	ldr	r3, [pc, #148]	; c100cd0 <port_init+0x174>
+ c100c38:	e59f2094 	ldr	r2, [pc, #148]	; c100cd4 <port_init+0x178>
+ c100c3c:	e5832000 	str	r2, [r3]
+    PUPG  = 0x30;
+ c100c40:	e59f3090 	ldr	r3, [pc, #144]	; c100cd8 <port_init+0x17c>
+ c100c44:	e3a02030 	mov	r2, #48	; 0x30
+ c100c48:	e5832000 	str	r2, [r3]
+
+    SPUCR = 0x7;
+ c100c4c:	e59f3088 	ldr	r3, [pc, #136]	; c100cdc <port_init+0x180>
+ c100c50:	e3a02007 	mov	r2, #7
+ c100c54:	e5832000 	str	r2, [r3]
+    
+    EXTINT = 0x22000220;
+ c100c58:	e59f3080 	ldr	r3, [pc, #128]	; c100ce0 <port_init+0x184>
+ c100c5c:	e59f2080 	ldr	r2, [pc, #128]	; c100ce4 <port_init+0x188>
+ c100c60:	e5832000 	str	r2, [r3]
+}
+ c100c64:	e24bd00c 	sub	sp, fp, #12
+ c100c68:	e89d6800 	ldm	sp, {fp, sp, lr}
+ c100c6c:	e12fff1e 	bx	lr
+ c100c70:	01d20004 	.word	0x01d20004
+ c100c74:	01d20000 	.word	0x01d20000
+ c100c78:	01d2000c 	.word	0x01d2000c
+ c100c7c:	01d20008 	.word	0x01d20008
+ c100c80:	0000014f 	.word	0x0000014f
+ c100c84:	01d20014 	.word	0x01d20014
+ c100c88:	01d20010 	.word	0x01d20010
+ c100c8c:	5ff555ff 	.word	0x5ff555ff
+ c100c90:	01d20018 	.word	0x01d20018
+ c100c94:	000094fb 	.word	0x000094fb
+ c100c98:	01d20020 	.word	0x01d20020
+ c100c9c:	01d2001c 	.word	0x01d2001c
+ c100ca0:	0000aaaa 	.word	0x0000aaaa
+ c100ca4:	01d20024 	.word	0x01d20024
+ c100ca8:	01d2002c 	.word	0x01d2002c
+ c100cac:	01d20028 	.word	0x01d20028
+ c100cb0:	000255a9 	.word	0x000255a9
+ c100cb4:	01d20030 	.word	0x01d20030
+ c100cb8:	000001fb 	.word	0x000001fb
+ c100cbc:	01d20038 	.word	0x01d20038
+ c100cc0:	01d20034 	.word	0x01d20034
+ c100cc4:	0000251a 	.word	0x0000251a
+ c100cc8:	01d2003c 	.word	0x01d2003c
+ c100ccc:	01d20044 	.word	0x01d20044
+ c100cd0:	01d20040 	.word	0x01d20040
+ c100cd4:	0000f5ff 	.word	0x0000f5ff
+ c100cd8:	01d20048 	.word	0x01d20048
+ c100cdc:	01d2004c 	.word	0x01d2004c
+ c100ce0:	01d20050 	.word	0x01d20050
+ c100ce4:	22000220 	.word	0x22000220
+
+0c100ce8 <install_dummy_isr>:
+
+
+
+static void install_dummy_isr( void )
+{ 
+ c100ce8:	e1a0c00d 	mov	ip, sp
+ c100cec:	e92dd800 	push	{fp, ip, lr, pc}
+ c100cf0:	e24cb004 	sub	fp, ip, #4
+    
+
+    pISR_TICK = (uint32) isr_TICK_dummy;
+ c100cf4:	e59f3010 	ldr	r3, [pc, #16]	; c100d0c <install_dummy_isr+0x24>
+ c100cf8:	e59f2010 	ldr	r2, [pc, #16]	; c100d10 <install_dummy_isr+0x28>
+ c100cfc:	e5832000 	str	r2, [r3]
+    
+}        
+ c100d00:	e24bd00c 	sub	sp, fp, #12
+ c100d04:	e89d6800 	ldm	sp, {fp, sp, lr}
+ c100d08:	e12fff1e 	bx	lr
+ c100d0c:	0c7fff70 	.word	0x0c7fff70
+ c100d10:	0c10118c 	.word	0x0c10118c
+
+0c100d14 <isr_SWI_dummy>:
+
+
+void isr_SWI_dummy( void )
+{
+ c100d14:	e52dc004 	push	{ip}		; (str ip, [sp, #-4]!)
+ c100d18:	e1a0c00d 	mov	ip, sp
+ c100d1c:	e92dd80f 	push	{r0, r1, r2, r3, fp, ip, lr, pc}
+ c100d20:	e24cb004 	sub	fp, ip, #4
+    uart0_puts( "\n\n*** ERROR FATAL: ejecutando SWI" );
+ c100d24:	e59f0010 	ldr	r0, [pc, #16]	; c100d3c <isr_SWI_dummy+0x28>
+ c100d28:	eb0001ad 	bl	c1013e4 <uart0_puts>
+    SEGS = 0x75;
+ c100d2c:	e3a03785 	mov	r3, #34865152	; 0x2140000
+ c100d30:	e3a02075 	mov	r2, #117	; 0x75
+ c100d34:	e5c32000 	strb	r2, [r3]
+    while( 1 );
+ c100d38:	eafffffe 	b	c100d38 <isr_SWI_dummy+0x24>
+ c100d3c:	0c1018bc 	.word	0x0c1018bc
+
+0c100d40 <isr_UNDEF_dummy>:
+}
+
+void isr_UNDEF_dummy( void )
+{
+ c100d40:	e52dc004 	push	{ip}		; (str ip, [sp, #-4]!)
+ c100d44:	e1a0c00d 	mov	ip, sp
+ c100d48:	e92dd80f 	push	{r0, r1, r2, r3, fp, ip, lr, pc}
+ c100d4c:	e24cb004 	sub	fp, ip, #4
+    uart0_puts( "\n\n*** ERROR FATAL: ejecutando UNDEF " );
+ c100d50:	e59f0010 	ldr	r0, [pc, #16]	; c100d68 <isr_UNDEF_dummy+0x28>
+ c100d54:	eb0001a2 	bl	c1013e4 <uart0_puts>
+    SEGS = 0x75;
+ c100d58:	e3a03785 	mov	r3, #34865152	; 0x2140000
+ c100d5c:	e3a02075 	mov	r2, #117	; 0x75
+ c100d60:	e5c32000 	strb	r2, [r3]
+    while( 1 );
+ c100d64:	eafffffe 	b	c100d64 <isr_UNDEF_dummy+0x24>
+ c100d68:	0c1018e0 	.word	0x0c1018e0
+
+0c100d6c <isr_IRQ_dummy>:
+}
+
+void isr_IRQ_dummy( void )
+{
+ c100d6c:	e52dc004 	push	{ip}		; (str ip, [sp, #-4]!)
+ c100d70:	e1a0c00d 	mov	ip, sp
+ c100d74:	e92dd80f 	push	{r0, r1, r2, r3, fp, ip, lr, pc}
+ c100d78:	e24cb004 	sub	fp, ip, #4
+    uart0_puts( "\n\n*** ERROR FATAL: ejecutando IRQ" );
+ c100d7c:	e59f0010 	ldr	r0, [pc, #16]	; c100d94 <isr_IRQ_dummy+0x28>
+ c100d80:	eb000197 	bl	c1013e4 <uart0_puts>
+    SEGS = 0x75;
+ c100d84:	e3a03785 	mov	r3, #34865152	; 0x2140000
+ c100d88:	e3a02075 	mov	r2, #117	; 0x75
+ c100d8c:	e5c32000 	strb	r2, [r3]
+    while( 1 );
+ c100d90:	eafffffe 	b	c100d90 <isr_IRQ_dummy+0x24>
+ c100d94:	0c101908 	.word	0x0c101908
+
+0c100d98 <isr_FIQ_dummy>:
+}
+
+void isr_FIQ_dummy( void )
+{
+ c100d98:	e52dc004 	push	{ip}		; (str ip, [sp, #-4]!)
+ c100d9c:	e1a0c00d 	mov	ip, sp
+ c100da0:	e92dd80f 	push	{r0, r1, r2, r3, fp, ip, lr, pc}
+ c100da4:	e24cb004 	sub	fp, ip, #4
+    uart0_puts( "\n\n*** ERROR FATAL: ejecutando FIQ" );
+ c100da8:	e59f0010 	ldr	r0, [pc, #16]	; c100dc0 <isr_FIQ_dummy+0x28>
+ c100dac:	eb00018c 	bl	c1013e4 <uart0_puts>
+    SEGS = 0x75;
+ c100db0:	e3a03785 	mov	r3, #34865152	; 0x2140000
+ c100db4:	e3a02075 	mov	r2, #117	; 0x75
+ c100db8:	e5c32000 	strb	r2, [r3]
+    while( 1 );
+ c100dbc:	eafffffe 	b	c100dbc <isr_FIQ_dummy+0x24>
+ c100dc0:	0c10192c 	.word	0x0c10192c
+
+0c100dc4 <isr_PABORT_dummy>:
+}
+
+void isr_PABORT_dummy( void )
+{
+ c100dc4:	e52dc004 	push	{ip}		; (str ip, [sp, #-4]!)
+ c100dc8:	e1a0c00d 	mov	ip, sp
+ c100dcc:	e92dd80f 	push	{r0, r1, r2, r3, fp, ip, lr, pc}
+ c100dd0:	e24cb004 	sub	fp, ip, #4
+    uart0_puts( "\n\n*** ERROR FATAL: ejecutando PABORT" );
+ c100dd4:	e59f0010 	ldr	r0, [pc, #16]	; c100dec <isr_PABORT_dummy+0x28>
+ c100dd8:	eb000181 	bl	c1013e4 <uart0_puts>
+    SEGS = 0x75;
+ c100ddc:	e3a03785 	mov	r3, #34865152	; 0x2140000
+ c100de0:	e3a02075 	mov	r2, #117	; 0x75
+ c100de4:	e5c32000 	strb	r2, [r3]
+    while( 1 );
+ c100de8:	eafffffe 	b	c100de8 <isr_PABORT_dummy+0x24>
+ c100dec:	0c101950 	.word	0x0c101950
+
+0c100df0 <isr_DABORT_dummy>:
+}
+
+void isr_DABORT_dummy( void )
+{
+ c100df0:	e52dc004 	push	{ip}		; (str ip, [sp, #-4]!)
+ c100df4:	e1a0c00d 	mov	ip, sp
+ c100df8:	e92dd80f 	push	{r0, r1, r2, r3, fp, ip, lr, pc}
+ c100dfc:	e24cb004 	sub	fp, ip, #4
+    uart0_puts( "\n\n*** ERROR FATAL: ejecutando DABORT " );
+ c100e00:	e59f0010 	ldr	r0, [pc, #16]	; c100e18 <isr_DABORT_dummy+0x28>
+ c100e04:	eb000176 	bl	c1013e4 <uart0_puts>
+    SEGS = 0x75;
+ c100e08:	e3a03785 	mov	r3, #34865152	; 0x2140000
+ c100e0c:	e3a02075 	mov	r2, #117	; 0x75
+ c100e10:	e5c32000 	strb	r2, [r3]
+    while( 1 );
+ c100e14:	eafffffe 	b	c100e14 <isr_DABORT_dummy+0x24>
+ c100e18:	0c101978 	.word	0x0c101978
+
+0c100e1c <isr_ADC_dummy>:
+}
+
+void isr_ADC_dummy( void )
+{
+ c100e1c:	e52dc004 	push	{ip}		; (str ip, [sp, #-4]!)
+ c100e20:	e1a0c00d 	mov	ip, sp
+ c100e24:	e92dd80f 	push	{r0, r1, r2, r3, fp, ip, lr, pc}
+ c100e28:	e24cb004 	sub	fp, ip, #4
+    uart0_puts( "\n\n*** ERROR FATAL: ejecutando ADC" );
+ c100e2c:	e59f0010 	ldr	r0, [pc, #16]	; c100e44 <isr_ADC_dummy+0x28>
+ c100e30:	eb00016b 	bl	c1013e4 <uart0_puts>
+    SEGS = 0x75;
+ c100e34:	e3a03785 	mov	r3, #34865152	; 0x2140000
+ c100e38:	e3a02075 	mov	r2, #117	; 0x75
+ c100e3c:	e5c32000 	strb	r2, [r3]
+    while( 1 );
+ c100e40:	eafffffe 	b	c100e40 <isr_ADC_dummy+0x24>
+ c100e44:	0c1019a0 	.word	0x0c1019a0
+
+0c100e48 <isr_RTC_dummy>:
+}
+
+void isr_RTC_dummy( void )
+{
+ c100e48:	e52dc004 	push	{ip}		; (str ip, [sp, #-4]!)
+ c100e4c:	e1a0c00d 	mov	ip, sp
+ c100e50:	e92dd80f 	push	{r0, r1, r2, r3, fp, ip, lr, pc}
+ c100e54:	e24cb004 	sub	fp, ip, #4
+    uart0_puts( "\n\n*** ERROR FATAL: ejecutando RTC" );
+ c100e58:	e59f0010 	ldr	r0, [pc, #16]	; c100e70 <isr_RTC_dummy+0x28>
+ c100e5c:	eb000160 	bl	c1013e4 <uart0_puts>
+    SEGS = 0x75;
+ c100e60:	e3a03785 	mov	r3, #34865152	; 0x2140000
+ c100e64:	e3a02075 	mov	r2, #117	; 0x75
+ c100e68:	e5c32000 	strb	r2, [r3]
+    while( 1 );
+ c100e6c:	eafffffe 	b	c100e6c <isr_RTC_dummy+0x24>
+ c100e70:	0c1019c4 	.word	0x0c1019c4
+
+0c100e74 <isr_UTXD1_dummy>:
+}
+
+void isr_UTXD1_dummy( void )
+{
+ c100e74:	e52dc004 	push	{ip}		; (str ip, [sp, #-4]!)
+ c100e78:	e1a0c00d 	mov	ip, sp
+ c100e7c:	e92dd80f 	push	{r0, r1, r2, r3, fp, ip, lr, pc}
+ c100e80:	e24cb004 	sub	fp, ip, #4
+    uart0_puts( "\n\n*** ERROR FATAL: ejecutando UTXD1" );
+ c100e84:	e59f0010 	ldr	r0, [pc, #16]	; c100e9c <isr_UTXD1_dummy+0x28>
+ c100e88:	eb000155 	bl	c1013e4 <uart0_puts>
+    SEGS = 0x75;
+ c100e8c:	e3a03785 	mov	r3, #34865152	; 0x2140000
+ c100e90:	e3a02075 	mov	r2, #117	; 0x75
+ c100e94:	e5c32000 	strb	r2, [r3]
+    while( 1 );
+ c100e98:	eafffffe 	b	c100e98 <isr_UTXD1_dummy+0x24>
+ c100e9c:	0c1019e8 	.word	0x0c1019e8
+
+0c100ea0 <isr_UTXD0_dummy>:
+}
+
+void isr_UTXD0_dummy( void )
+{
+ c100ea0:	e52dc004 	push	{ip}		; (str ip, [sp, #-4]!)
+ c100ea4:	e1a0c00d 	mov	ip, sp
+ c100ea8:	e92dd80f 	push	{r0, r1, r2, r3, fp, ip, lr, pc}
+ c100eac:	e24cb004 	sub	fp, ip, #4
+    uart0_puts( "\n\n*** ERROR FATAL: ejecutando UTXD0" );
+ c100eb0:	e59f0010 	ldr	r0, [pc, #16]	; c100ec8 <isr_UTXD0_dummy+0x28>
+ c100eb4:	eb00014a 	bl	c1013e4 <uart0_puts>
+    SEGS = 0x75;
+ c100eb8:	e3a03785 	mov	r3, #34865152	; 0x2140000
+ c100ebc:	e3a02075 	mov	r2, #117	; 0x75
+ c100ec0:	e5c32000 	strb	r2, [r3]
+    while( 1 );
+ c100ec4:	eafffffe 	b	c100ec4 <isr_UTXD0_dummy+0x24>
+ c100ec8:	0c101a0c 	.word	0x0c101a0c
+
+0c100ecc <isr_SIO_dummy>:
+}
+
+void isr_SIO_dummy( void )
+{
+ c100ecc:	e52dc004 	push	{ip}		; (str ip, [sp, #-4]!)
+ c100ed0:	e1a0c00d 	mov	ip, sp
+ c100ed4:	e92dd80f 	push	{r0, r1, r2, r3, fp, ip, lr, pc}
+ c100ed8:	e24cb004 	sub	fp, ip, #4
+    uart0_puts( "\n\n*** ERROR FATAL: ejecutando SIO" );
+ c100edc:	e59f0010 	ldr	r0, [pc, #16]	; c100ef4 <isr_SIO_dummy+0x28>
+ c100ee0:	eb00013f 	bl	c1013e4 <uart0_puts>
+    SEGS = 0x75;
+ c100ee4:	e3a03785 	mov	r3, #34865152	; 0x2140000
+ c100ee8:	e3a02075 	mov	r2, #117	; 0x75
+ c100eec:	e5c32000 	strb	r2, [r3]
+    while( 1 );
+ c100ef0:	eafffffe 	b	c100ef0 <isr_SIO_dummy+0x24>
+ c100ef4:	0c101a30 	.word	0x0c101a30
+
+0c100ef8 <isr_IIC_dummy>:
+}
+
+void isr_IIC_dummy( void )
+{
+ c100ef8:	e52dc004 	push	{ip}		; (str ip, [sp, #-4]!)
+ c100efc:	e1a0c00d 	mov	ip, sp
+ c100f00:	e92dd80f 	push	{r0, r1, r2, r3, fp, ip, lr, pc}
+ c100f04:	e24cb004 	sub	fp, ip, #4
+    uart0_puts( "\n\n*** ERROR FATAL: ejecutando IIC" );
+ c100f08:	e59f0010 	ldr	r0, [pc, #16]	; c100f20 <isr_IIC_dummy+0x28>
+ c100f0c:	eb000134 	bl	c1013e4 <uart0_puts>
+    SEGS = 0x75;
+ c100f10:	e3a03785 	mov	r3, #34865152	; 0x2140000
+ c100f14:	e3a02075 	mov	r2, #117	; 0x75
+ c100f18:	e5c32000 	strb	r2, [r3]
+    while( 1 );
+ c100f1c:	eafffffe 	b	c100f1c <isr_IIC_dummy+0x24>
+ c100f20:	0c101a54 	.word	0x0c101a54
+
+0c100f24 <isr_URXD1_dummy>:
+}
+
+void isr_URXD1_dummy( void )
+{
+ c100f24:	e52dc004 	push	{ip}		; (str ip, [sp, #-4]!)
+ c100f28:	e1a0c00d 	mov	ip, sp
+ c100f2c:	e92dd80f 	push	{r0, r1, r2, r3, fp, ip, lr, pc}
+ c100f30:	e24cb004 	sub	fp, ip, #4
+    uart0_puts( "\n\n*** ERROR FATAL: ejecutando URXD1" );
+ c100f34:	e59f0010 	ldr	r0, [pc, #16]	; c100f4c <isr_URXD1_dummy+0x28>
+ c100f38:	eb000129 	bl	c1013e4 <uart0_puts>
+    SEGS = 0x75;
+ c100f3c:	e3a03785 	mov	r3, #34865152	; 0x2140000
+ c100f40:	e3a02075 	mov	r2, #117	; 0x75
+ c100f44:	e5c32000 	strb	r2, [r3]
+    while( 1 );
+ c100f48:	eafffffe 	b	c100f48 <isr_URXD1_dummy+0x24>
+ c100f4c:	0c101a78 	.word	0x0c101a78
+
+0c100f50 <isr_URXD0_dummy>:
+}
+
+void isr_URXD0_dummy( void )
+{
+ c100f50:	e52dc004 	push	{ip}		; (str ip, [sp, #-4]!)
+ c100f54:	e1a0c00d 	mov	ip, sp
+ c100f58:	e92dd80f 	push	{r0, r1, r2, r3, fp, ip, lr, pc}
+ c100f5c:	e24cb004 	sub	fp, ip, #4
+    uart0_puts( "\n\n*** ERROR FATAL: ejecutando URZD0" );
+ c100f60:	e59f0010 	ldr	r0, [pc, #16]	; c100f78 <isr_URXD0_dummy+0x28>
+ c100f64:	eb00011e 	bl	c1013e4 <uart0_puts>
+    SEGS = 0x75;
+ c100f68:	e3a03785 	mov	r3, #34865152	; 0x2140000
+ c100f6c:	e3a02075 	mov	r2, #117	; 0x75
+ c100f70:	e5c32000 	strb	r2, [r3]
+    while( 1 );
+ c100f74:	eafffffe 	b	c100f74 <isr_URXD0_dummy+0x24>
+ c100f78:	0c101a9c 	.word	0x0c101a9c
+
+0c100f7c <isr_TIMER5_dummy>:
+}
+
+void isr_TIMER5_dummy( void )
+{
+ c100f7c:	e52dc004 	push	{ip}		; (str ip, [sp, #-4]!)
+ c100f80:	e1a0c00d 	mov	ip, sp
+ c100f84:	e92dd80f 	push	{r0, r1, r2, r3, fp, ip, lr, pc}
+ c100f88:	e24cb004 	sub	fp, ip, #4
+    uart0_puts( "\n\n*** ERROR FATAL: ejecutando TIMER5 " );
+ c100f8c:	e59f0010 	ldr	r0, [pc, #16]	; c100fa4 <isr_TIMER5_dummy+0x28>
+ c100f90:	eb000113 	bl	c1013e4 <uart0_puts>
+    SEGS = 0x75;
+ c100f94:	e3a03785 	mov	r3, #34865152	; 0x2140000
+ c100f98:	e3a02075 	mov	r2, #117	; 0x75
+ c100f9c:	e5c32000 	strb	r2, [r3]
+    while( 1 );
+ c100fa0:	eafffffe 	b	c100fa0 <isr_TIMER5_dummy+0x24>
+ c100fa4:	0c101ac0 	.word	0x0c101ac0
+
+0c100fa8 <isr_TIMER4_dummy>:
+}
+
+void isr_TIMER4_dummy( void )
+{
+ c100fa8:	e52dc004 	push	{ip}		; (str ip, [sp, #-4]!)
+ c100fac:	e1a0c00d 	mov	ip, sp
+ c100fb0:	e92dd80f 	push	{r0, r1, r2, r3, fp, ip, lr, pc}
+ c100fb4:	e24cb004 	sub	fp, ip, #4
+    uart0_puts( "\n\n*** ERROR FATAL: ejecutando TIMER4" );
+ c100fb8:	e59f0010 	ldr	r0, [pc, #16]	; c100fd0 <isr_TIMER4_dummy+0x28>
+ c100fbc:	eb000108 	bl	c1013e4 <uart0_puts>
+    SEGS = 0x75;
+ c100fc0:	e3a03785 	mov	r3, #34865152	; 0x2140000
+ c100fc4:	e3a02075 	mov	r2, #117	; 0x75
+ c100fc8:	e5c32000 	strb	r2, [r3]
+    while( 1 );
+ c100fcc:	eafffffe 	b	c100fcc <isr_TIMER4_dummy+0x24>
+ c100fd0:	0c101ae8 	.word	0x0c101ae8
+
+0c100fd4 <isr_TIMER3_dummy>:
+}
+
+void isr_TIMER3_dummy( void )
+{
+ c100fd4:	e52dc004 	push	{ip}		; (str ip, [sp, #-4]!)
+ c100fd8:	e1a0c00d 	mov	ip, sp
+ c100fdc:	e92dd80f 	push	{r0, r1, r2, r3, fp, ip, lr, pc}
+ c100fe0:	e24cb004 	sub	fp, ip, #4
+    uart0_puts( "\n\n*** ERROR FATAL: ejecutando TIMER3" );
+ c100fe4:	e59f0010 	ldr	r0, [pc, #16]	; c100ffc <isr_TIMER3_dummy+0x28>
+ c100fe8:	eb0000fd 	bl	c1013e4 <uart0_puts>
+    SEGS = 0x75;
+ c100fec:	e3a03785 	mov	r3, #34865152	; 0x2140000
+ c100ff0:	e3a02075 	mov	r2, #117	; 0x75
+ c100ff4:	e5c32000 	strb	r2, [r3]
+    while( 1 );
+ c100ff8:	eafffffe 	b	c100ff8 <isr_TIMER3_dummy+0x24>
+ c100ffc:	0c101b10 	.word	0x0c101b10
+
+0c101000 <isr_TIMER2_dummy>:
+}
+
+void isr_TIMER2_dummy( void )
+{
+ c101000:	e52dc004 	push	{ip}		; (str ip, [sp, #-4]!)
+ c101004:	e1a0c00d 	mov	ip, sp
+ c101008:	e92dd80f 	push	{r0, r1, r2, r3, fp, ip, lr, pc}
+ c10100c:	e24cb004 	sub	fp, ip, #4
+    uart0_puts( "\n\n*** ERROR FATAL: ejecutando TIMER2" );
+ c101010:	e59f0010 	ldr	r0, [pc, #16]	; c101028 <isr_TIMER2_dummy+0x28>
+ c101014:	eb0000f2 	bl	c1013e4 <uart0_puts>
+    SEGS = 0x75;
+ c101018:	e3a03785 	mov	r3, #34865152	; 0x2140000
+ c10101c:	e3a02075 	mov	r2, #117	; 0x75
+ c101020:	e5c32000 	strb	r2, [r3]
+    while( 1 );
+ c101024:	eafffffe 	b	c101024 <isr_TIMER2_dummy+0x24>
+ c101028:	0c101b38 	.word	0x0c101b38
+
+0c10102c <isr_TIMER1_dummy>:
+}
+
+void isr_TIMER1_dummy( void )
+{
+ c10102c:	e52dc004 	push	{ip}		; (str ip, [sp, #-4]!)
+ c101030:	e1a0c00d 	mov	ip, sp
+ c101034:	e92dd80f 	push	{r0, r1, r2, r3, fp, ip, lr, pc}
+ c101038:	e24cb004 	sub	fp, ip, #4
+    uart0_puts( "\n\n*** ERROR FATAL: ejecutando TIMER1" );
+ c10103c:	e59f0010 	ldr	r0, [pc, #16]	; c101054 <isr_TIMER1_dummy+0x28>
+ c101040:	eb0000e7 	bl	c1013e4 <uart0_puts>
+    SEGS = 0x75;
+ c101044:	e3a03785 	mov	r3, #34865152	; 0x2140000
+ c101048:	e3a02075 	mov	r2, #117	; 0x75
+ c10104c:	e5c32000 	strb	r2, [r3]
+    while( 1 );
+ c101050:	eafffffe 	b	c101050 <isr_TIMER1_dummy+0x24>
+ c101054:	0c101b60 	.word	0x0c101b60
+
+0c101058 <isr_TIMER0_dummy>:
+}
+
+void isr_TIMER0_dummy( void )
+{
+ c101058:	e52dc004 	push	{ip}		; (str ip, [sp, #-4]!)
+ c10105c:	e1a0c00d 	mov	ip, sp
+ c101060:	e92dd80f 	push	{r0, r1, r2, r3, fp, ip, lr, pc}
+ c101064:	e24cb004 	sub	fp, ip, #4
+    uart0_puts( "\n\n*** ERROR FATAL: ejecutando TIMER0" );
+ c101068:	e59f0010 	ldr	r0, [pc, #16]	; c101080 <isr_TIMER0_dummy+0x28>
+ c10106c:	eb0000dc 	bl	c1013e4 <uart0_puts>
+    SEGS = 0x75;
+ c101070:	e3a03785 	mov	r3, #34865152	; 0x2140000
+ c101074:	e3a02075 	mov	r2, #117	; 0x75
+ c101078:	e5c32000 	strb	r2, [r3]
+    while( 1 );
+ c10107c:	eafffffe 	b	c10107c <isr_TIMER0_dummy+0x24>
+ c101080:	0c101b88 	.word	0x0c101b88
+
+0c101084 <isr_UERR01_dummy>:
+}
+
+void isr_UERR01_dummy( void )
+{
+ c101084:	e52dc004 	push	{ip}		; (str ip, [sp, #-4]!)
+ c101088:	e1a0c00d 	mov	ip, sp
+ c10108c:	e92dd80f 	push	{r0, r1, r2, r3, fp, ip, lr, pc}
+ c101090:	e24cb004 	sub	fp, ip, #4
+    uart0_puts( "\n\n*** ERROR FATAL: ejecutando UERR01" );
+ c101094:	e59f0010 	ldr	r0, [pc, #16]	; c1010ac <isr_UERR01_dummy+0x28>
+ c101098:	eb0000d1 	bl	c1013e4 <uart0_puts>
+    SEGS = 0x75;
+ c10109c:	e3a03785 	mov	r3, #34865152	; 0x2140000
+ c1010a0:	e3a02075 	mov	r2, #117	; 0x75
+ c1010a4:	e5c32000 	strb	r2, [r3]
+    while( 1 );
+ c1010a8:	eafffffe 	b	c1010a8 <isr_UERR01_dummy+0x24>
+ c1010ac:	0c101bb0 	.word	0x0c101bb0
+
+0c1010b0 <isr_WDT_dummy>:
+}
+
+void isr_WDT_dummy( void )
+{
+ c1010b0:	e52dc004 	push	{ip}		; (str ip, [sp, #-4]!)
+ c1010b4:	e1a0c00d 	mov	ip, sp
+ c1010b8:	e92dd80f 	push	{r0, r1, r2, r3, fp, ip, lr, pc}
+ c1010bc:	e24cb004 	sub	fp, ip, #4
+    uart0_puts( "\n\n*** ERROR FATAL: ejecutando WDT" );
+ c1010c0:	e59f0010 	ldr	r0, [pc, #16]	; c1010d8 <isr_WDT_dummy+0x28>
+ c1010c4:	eb0000c6 	bl	c1013e4 <uart0_puts>
+    SEGS = 0x75;
+ c1010c8:	e3a03785 	mov	r3, #34865152	; 0x2140000
+ c1010cc:	e3a02075 	mov	r2, #117	; 0x75
+ c1010d0:	e5c32000 	strb	r2, [r3]
+    while( 1 );
+ c1010d4:	eafffffe 	b	c1010d4 <isr_WDT_dummy+0x24>
+ c1010d8:	0c101bd8 	.word	0x0c101bd8
+
+0c1010dc <isr_BDMA1_dummy>:
+}
+
+void isr_BDMA1_dummy( void )
+{
+ c1010dc:	e52dc004 	push	{ip}		; (str ip, [sp, #-4]!)
+ c1010e0:	e1a0c00d 	mov	ip, sp
+ c1010e4:	e92dd80f 	push	{r0, r1, r2, r3, fp, ip, lr, pc}
+ c1010e8:	e24cb004 	sub	fp, ip, #4
+    uart0_puts( "\n\n*** ERROR FATAL: ejecutando BDMA1 " );
+ c1010ec:	e59f0010 	ldr	r0, [pc, #16]	; c101104 <isr_BDMA1_dummy+0x28>
+ c1010f0:	eb0000bb 	bl	c1013e4 <uart0_puts>
+    SEGS = 0x75;
+ c1010f4:	e3a03785 	mov	r3, #34865152	; 0x2140000
+ c1010f8:	e3a02075 	mov	r2, #117	; 0x75
+ c1010fc:	e5c32000 	strb	r2, [r3]
+    while( 1 );
+ c101100:	eafffffe 	b	c101100 <isr_BDMA1_dummy+0x24>
+ c101104:	0c101bfc 	.word	0x0c101bfc
+
+0c101108 <isr_BDMA0_dummy>:
+}
+
+void isr_BDMA0_dummy( void )
+{
+ c101108:	e52dc004 	push	{ip}		; (str ip, [sp, #-4]!)
+ c10110c:	e1a0c00d 	mov	ip, sp
+ c101110:	e92dd80f 	push	{r0, r1, r2, r3, fp, ip, lr, pc}
+ c101114:	e24cb004 	sub	fp, ip, #4
+    uart0_puts( "\n\n*** ERROR FATAL: ejecutando BDMA0" );
+ c101118:	e59f0010 	ldr	r0, [pc, #16]	; c101130 <isr_BDMA0_dummy+0x28>
+ c10111c:	eb0000b0 	bl	c1013e4 <uart0_puts>
+    SEGS = 0x75;
+ c101120:	e3a03785 	mov	r3, #34865152	; 0x2140000
+ c101124:	e3a02075 	mov	r2, #117	; 0x75
+ c101128:	e5c32000 	strb	r2, [r3]
+    while( 1 );
+ c10112c:	eafffffe 	b	c10112c <isr_BDMA0_dummy+0x24>
+ c101130:	0c101c24 	.word	0x0c101c24
+
+0c101134 <isr_ZDMA1_dummy>:
+}
+
+void isr_ZDMA1_dummy( void )
+{
+ c101134:	e52dc004 	push	{ip}		; (str ip, [sp, #-4]!)
+ c101138:	e1a0c00d 	mov	ip, sp
+ c10113c:	e92dd80f 	push	{r0, r1, r2, r3, fp, ip, lr, pc}
+ c101140:	e24cb004 	sub	fp, ip, #4
+    uart0_puts( "\n\n*** ERROR FATAL: ejecutando ZDMA1 " );
+ c101144:	e59f0010 	ldr	r0, [pc, #16]	; c10115c <isr_ZDMA1_dummy+0x28>
+ c101148:	eb0000a5 	bl	c1013e4 <uart0_puts>
+    SEGS = 0x75;
+ c10114c:	e3a03785 	mov	r3, #34865152	; 0x2140000
+ c101150:	e3a02075 	mov	r2, #117	; 0x75
+ c101154:	e5c32000 	strb	r2, [r3]
+    while( 1 );
+ c101158:	eafffffe 	b	c101158 <isr_ZDMA1_dummy+0x24>
+ c10115c:	0c101c48 	.word	0x0c101c48
+
+0c101160 <isr_ZDMA0_dummy>:
+}
+
+void isr_ZDMA0_dummy( void )
+{
+ c101160:	e52dc004 	push	{ip}		; (str ip, [sp, #-4]!)
+ c101164:	e1a0c00d 	mov	ip, sp
+ c101168:	e92dd80f 	push	{r0, r1, r2, r3, fp, ip, lr, pc}
+ c10116c:	e24cb004 	sub	fp, ip, #4
+    uart0_puts( "\n\n*** ERROR FATAL: ejecutando ZDMA0" );
+ c101170:	e59f0010 	ldr	r0, [pc, #16]	; c101188 <isr_ZDMA0_dummy+0x28>
+ c101174:	eb00009a 	bl	c1013e4 <uart0_puts>
+    SEGS = 0x75;
+ c101178:	e3a03785 	mov	r3, #34865152	; 0x2140000
+ c10117c:	e3a02075 	mov	r2, #117	; 0x75
+ c101180:	e5c32000 	strb	r2, [r3]
+    while( 1 );
+ c101184:	eafffffe 	b	c101184 <isr_ZDMA0_dummy+0x24>
+ c101188:	0c101c70 	.word	0x0c101c70
+
+0c10118c <isr_TICK_dummy>:
+}
+
+
+void isr_TICK_dummy( void )
+{
+ c10118c:	e52dc004 	push	{ip}		; (str ip, [sp, #-4]!)
+ c101190:	e1a0c00d 	mov	ip, sp
+ c101194:	e92dd80f 	push	{r0, r1, r2, r3, fp, ip, lr, pc}
+ c101198:	e24cb004 	sub	fp, ip, #4
+    uart0_puts( "\n\n*** ERROR FATAL: ejecutando isr_TICK_dummy" );
+ c10119c:	e59f0010 	ldr	r0, [pc, #16]	; c1011b4 <isr_TICK_dummy+0x28>
+ c1011a0:	eb00008f 	bl	c1013e4 <uart0_puts>
+    SEGS = 0x75;
+ c1011a4:	e3a03785 	mov	r3, #34865152	; 0x2140000
+ c1011a8:	e3a02075 	mov	r2, #117	; 0x75
+ c1011ac:	e5c32000 	strb	r2, [r3]
+    while( 1 );
+ c1011b0:	eafffffe 	b	c1011b0 <isr_TICK_dummy+0x24>
+ c1011b4:	0c101c94 	.word	0x0c101c94
+
+0c1011b8 <isr_PB_dummy>:
+}
+
+
+void isr_PB_dummy( void )
+{
+ c1011b8:	e52dc004 	push	{ip}		; (str ip, [sp, #-4]!)
+ c1011bc:	e1a0c00d 	mov	ip, sp
+ c1011c0:	e92dd80f 	push	{r0, r1, r2, r3, fp, ip, lr, pc}
+ c1011c4:	e24cb004 	sub	fp, ip, #4
+     uart0_puts( "\n\n*** ERROR FATAL: ejecutando isr_PB_dummy" );
+ c1011c8:	e59f0010 	ldr	r0, [pc, #16]	; c1011e0 <isr_PB_dummy+0x28>
+ c1011cc:	eb000084 	bl	c1013e4 <uart0_puts>
+    SEGS = 0x75;
+ c1011d0:	e3a03785 	mov	r3, #34865152	; 0x2140000
+ c1011d4:	e3a02075 	mov	r2, #117	; 0x75
+ c1011d8:	e5c32000 	strb	r2, [r3]
+    while( 1 );
+ c1011dc:	eafffffe 	b	c1011dc <isr_PB_dummy+0x24>
+ c1011e0:	0c101cc4 	.word	0x0c101cc4
+
+0c1011e4 <isr_ETHERNET_dummy>:
+}
+
+void isr_ETHERNET_dummy( void )
+{
+ c1011e4:	e52dc004 	push	{ip}		; (str ip, [sp, #-4]!)
+ c1011e8:	e1a0c00d 	mov	ip, sp
+ c1011ec:	e92dd80f 	push	{r0, r1, r2, r3, fp, ip, lr, pc}
+ c1011f0:	e24cb004 	sub	fp, ip, #4
+    uart0_puts( "\n\n*** ERROR FATAL: ejecutando ethernet" );
+ c1011f4:	e59f0010 	ldr	r0, [pc, #16]	; c10120c <isr_ETHERNET_dummy+0x28>
+ c1011f8:	eb000079 	bl	c1013e4 <uart0_puts>
+    SEGS = 0x75;
+ c1011fc:	e3a03785 	mov	r3, #34865152	; 0x2140000
+ c101200:	e3a02075 	mov	r2, #117	; 0x75
+ c101204:	e5c32000 	strb	r2, [r3]
+    while( 1 );
+ c101208:	eafffffe 	b	c101208 <isr_ETHERNET_dummy+0x24>
+ c10120c:	0c101cf0 	.word	0x0c101cf0
+
+0c101210 <isr_TS_dummy>:
+}
+
+void isr_TS_dummy( void )
+{
+ c101210:	e52dc004 	push	{ip}		; (str ip, [sp, #-4]!)
+ c101214:	e1a0c00d 	mov	ip, sp
+ c101218:	e92dd80f 	push	{r0, r1, r2, r3, fp, ip, lr, pc}
+ c10121c:	e24cb004 	sub	fp, ip, #4
+    uart0_puts( "\n\n*** ERROR FATAL: ejecutando TS " );
+ c101220:	e59f0010 	ldr	r0, [pc, #16]	; c101238 <isr_TS_dummy+0x28>
+ c101224:	eb00006e 	bl	c1013e4 <uart0_puts>
+    SEGS = 0x75;
+ c101228:	e3a03785 	mov	r3, #34865152	; 0x2140000
+ c10122c:	e3a02075 	mov	r2, #117	; 0x75
+ c101230:	e5c32000 	strb	r2, [r3]
+    while( 1 );
+ c101234:	eafffffe 	b	c101234 <isr_TS_dummy+0x24>
+ c101238:	0c101d18 	.word	0x0c101d18
+
+0c10123c <isr_KEYPAD_dummy>:
+}
+
+void isr_KEYPAD_dummy( void )
+{
+ c10123c:	e52dc004 	push	{ip}		; (str ip, [sp, #-4]!)
+ c101240:	e1a0c00d 	mov	ip, sp
+ c101244:	e92dd80f 	push	{r0, r1, r2, r3, fp, ip, lr, pc}
+ c101248:	e24cb004 	sub	fp, ip, #4
+    uart0_puts( "\n\n*** ERROR FATAL: ejecutando KEYPAD " );
+ c10124c:	e59f0010 	ldr	r0, [pc, #16]	; c101264 <isr_KEYPAD_dummy+0x28>
+ c101250:	eb000063 	bl	c1013e4 <uart0_puts>
+    SEGS = 0x75;
+ c101254:	e3a03785 	mov	r3, #34865152	; 0x2140000
+ c101258:	e3a02075 	mov	r2, #117	; 0x75
+ c10125c:	e5c32000 	strb	r2, [r3]
+    while( 1 );
+ c101260:	eafffffe 	b	c101260 <isr_KEYPAD_dummy+0x24>
+ c101264:	0c101d3c 	.word	0x0c101d3c
+
+0c101268 <isr_USB_dummy>:
+}
+
+void isr_USB_dummy( void )
+{
+ c101268:	e52dc004 	push	{ip}		; (str ip, [sp, #-4]!)
+ c10126c:	e1a0c00d 	mov	ip, sp
+ c101270:	e92dd80f 	push	{r0, r1, r2, r3, fp, ip, lr, pc}
+ c101274:	e24cb004 	sub	fp, ip, #4
+    uart0_puts( "\n\n*** ERROR FATAL: ejecutando USB" );
+ c101278:	e59f0010 	ldr	r0, [pc, #16]	; c101290 <isr_USB_dummy+0x28>
+ c10127c:	eb000058 	bl	c1013e4 <uart0_puts>
+    SEGS = 0x75;
+ c101280:	e3a03785 	mov	r3, #34865152	; 0x2140000
+ c101284:	e3a02075 	mov	r2, #117	; 0x75
+ c101288:	e5c32000 	strb	r2, [r3]
+    while( 1 );
+ c10128c:	eafffffe 	b	c10128c <isr_USB_dummy+0x24>
+ c101290:	0c101d64 	.word	0x0c101d64
+
+0c101294 <show_sys_info>:
+}
+
+static void show_sys_info( void )
+{
+ c101294:	e1a0c00d 	mov	ip, sp
+ c101298:	e92dd800 	push	{fp, ip, lr, pc}
+ c10129c:	e24cb004 	sub	fp, ip, #4
+	uart0_puts( "\n\n*** Informacion:" );
+ c1012a0:	e59f000c 	ldr	r0, [pc, #12]	; c1012b4 <show_sys_info+0x20>
+ c1012a4:	eb00004e 	bl	c1013e4 <uart0_puts>
+}
+ c1012a8:	e24bd00c 	sub	sp, fp, #12
+ c1012ac:	e89d6800 	ldm	sp, {fp, sp, lr}
+ c1012b0:	e12fff1e 	bx	lr
+ c1012b4:	0c101d88 	.word	0x0c101d88
+
+0c1012b8 <sleep>:
+
+inline void sleep( void )
+{
+ c1012b8:	e1a0c00d 	mov	ip, sp
+ c1012bc:	e92dd800 	push	{fp, ip, lr, pc}
+ c1012c0:	e24cb004 	sub	fp, ip, #4
+    CLKCON |= (1 << 2);    // Pone a la CPU en estado IDLE
+ c1012c4:	e59f3018 	ldr	r3, [pc, #24]	; c1012e4 <sleep+0x2c>
+ c1012c8:	e59f2014 	ldr	r2, [pc, #20]	; c1012e4 <sleep+0x2c>
+ c1012cc:	e5922000 	ldr	r2, [r2]
+ c1012d0:	e3822004 	orr	r2, r2, #4
+ c1012d4:	e5832000 	str	r2, [r3]
+}
+ c1012d8:	e24bd00c 	sub	sp, fp, #12
+ c1012dc:	e89d6800 	ldm	sp, {fp, sp, lr}
+ c1012e0:	e12fff1e 	bx	lr
+ c1012e4:	01d80004 	.word	0x01d80004
+
+0c1012e8 <uart0_init>:
+*/
+#include <s3c44b0x.h>
+#include <uart.h>
+
+void uart0_init( void )
+{
+ c1012e8:	e1a0c00d 	mov	ip, sp
+ c1012ec:	e92dd800 	push	{fp, ip, lr, pc}
+ c1012f0:	e24cb004 	sub	fp, ip, #4
+    UFCON0 = 0x1;
+ c1012f4:	e59f3040 	ldr	r3, [pc, #64]	; c10133c <uart0_init+0x54>
+ c1012f8:	e3a02001 	mov	r2, #1
+ c1012fc:	e5832000 	str	r2, [r3]
+    UMCON0 = 0x0;
+ c101300:	e59f3038 	ldr	r3, [pc, #56]	; c101340 <uart0_init+0x58>
+ c101304:	e3a02000 	mov	r2, #0
+ c101308:	e5832000 	str	r2, [r3]
+    ULCON0 = 0x3;
+ c10130c:	e3a0361d 	mov	r3, #30408704	; 0x1d00000
+ c101310:	e3a02003 	mov	r2, #3
+ c101314:	e5832000 	str	r2, [r3]
+    UBRDIV0 = 0x22;
+ c101318:	e59f3024 	ldr	r3, [pc, #36]	; c101344 <uart0_init+0x5c>
+ c10131c:	e3a02022 	mov	r2, #34	; 0x22
+ c101320:	e5832000 	str	r2, [r3]
+    UCON0 = 0x5;
+ c101324:	e59f301c 	ldr	r3, [pc, #28]	; c101348 <uart0_init+0x60>
+ c101328:	e3a02005 	mov	r2, #5
+ c10132c:	e5832000 	str	r2, [r3]
+}
+ c101330:	e24bd00c 	sub	sp, fp, #12
+ c101334:	e89d6800 	ldm	sp, {fp, sp, lr}
+ c101338:	e12fff1e 	bx	lr
+ c10133c:	01d00008 	.word	0x01d00008
+ c101340:	01d0000c 	.word	0x01d0000c
+ c101344:	01d00028 	.word	0x01d00028
+ c101348:	01d00004 	.word	0x01d00004
+
+0c10134c <uart0_putchar>:
+
+void uart0_putchar( char ch )
+{
+ c10134c:	e1a0c00d 	mov	ip, sp
+ c101350:	e92dd800 	push	{fp, ip, lr, pc}
+ c101354:	e24cb004 	sub	fp, ip, #4
+ c101358:	e24dd008 	sub	sp, sp, #8
+ c10135c:	e1a03000 	mov	r3, r0
+ c101360:	e54b300d 	strb	r3, [fp, #-13]
+   while(  UFSTAT0 &(1 << 9) );
+ c101364:	e1a00000 	nop			; (mov r0, r0)
+ c101368:	e59f3024 	ldr	r3, [pc, #36]	; c101394 <uart0_putchar+0x48>
+ c10136c:	e5933000 	ldr	r3, [r3]
+ c101370:	e2033c02 	and	r3, r3, #512	; 0x200
+ c101374:	e3530000 	cmp	r3, #0
+ c101378:	1afffffa 	bne	c101368 <uart0_putchar+0x1c>
+
+   UTXH0 = ch;
+ c10137c:	e59f3014 	ldr	r3, [pc, #20]	; c101398 <uart0_putchar+0x4c>
+ c101380:	e55b200d 	ldrb	r2, [fp, #-13]
+ c101384:	e5832000 	str	r2, [r3]
+
+}
+ c101388:	e24bd00c 	sub	sp, fp, #12
+ c10138c:	e89d6800 	ldm	sp, {fp, sp, lr}
+ c101390:	e12fff1e 	bx	lr
+ c101394:	01d00018 	.word	0x01d00018
+ c101398:	01d00020 	.word	0x01d00020
+
+0c10139c <uart0_getchar>:
+
+char uart0_getchar( void )
+{
+ c10139c:	e1a0c00d 	mov	ip, sp
+ c1013a0:	e92dd800 	push	{fp, ip, lr, pc}
+ c1013a4:	e24cb004 	sub	fp, ip, #4
+    while( !(UFSTAT0 & 0xF) );
+ c1013a8:	e1a00000 	nop			; (mov r0, r0)
+ c1013ac:	e59f3028 	ldr	r3, [pc, #40]	; c1013dc <uart0_getchar+0x40>
+ c1013b0:	e5933000 	ldr	r3, [r3]
+ c1013b4:	e203300f 	and	r3, r3, #15
+ c1013b8:	e3530000 	cmp	r3, #0
+ c1013bc:	0afffffa 	beq	c1013ac <uart0_getchar+0x10>
+    return URXH0;
+ c1013c0:	e59f3018 	ldr	r3, [pc, #24]	; c1013e0 <uart0_getchar+0x44>
+ c1013c4:	e5933000 	ldr	r3, [r3]
+ c1013c8:	e20330ff 	and	r3, r3, #255	; 0xff
+
+
+
+}
+ c1013cc:	e1a00003 	mov	r0, r3
+ c1013d0:	e24bd00c 	sub	sp, fp, #12
+ c1013d4:	e89d6800 	ldm	sp, {fp, sp, lr}
+ c1013d8:	e12fff1e 	bx	lr
+ c1013dc:	01d00018 	.word	0x01d00018
+ c1013e0:	01d00024 	.word	0x01d00024
+
+0c1013e4 <uart0_puts>:
+
+void uart0_puts( char *s )
+{
+ c1013e4:	e1a0c00d 	mov	ip, sp
+ c1013e8:	e92dd800 	push	{fp, ip, lr, pc}
+ c1013ec:	e24cb004 	sub	fp, ip, #4
+ c1013f0:	e24dd008 	sub	sp, sp, #8
+ c1013f4:	e50b0010 	str	r0, [fp, #-16]
+	while( *s !='\0' ){
+ c1013f8:	ea000006 	b	c101418 <uart0_puts+0x34>
+		uart0_putchar(*s++);
+ c1013fc:	e51b3010 	ldr	r3, [fp, #-16]
+ c101400:	e5d33000 	ldrb	r3, [r3]
+ c101404:	e51b2010 	ldr	r2, [fp, #-16]
+ c101408:	e2822001 	add	r2, r2, #1
+ c10140c:	e50b2010 	str	r2, [fp, #-16]
+ c101410:	e1a00003 	mov	r0, r3
+ c101414:	ebffffcc 	bl	c10134c <uart0_putchar>
+
+}
+
+void uart0_puts( char *s )
+{
+	while( *s !='\0' ){
+ c101418:	e51b3010 	ldr	r3, [fp, #-16]
+ c10141c:	e5d33000 	ldrb	r3, [r3]
+ c101420:	e3530000 	cmp	r3, #0
+ c101424:	1afffff4 	bne	c1013fc <uart0_puts+0x18>
+		uart0_putchar(*s++);
+	}
+}
+ c101428:	e24bd00c 	sub	sp, fp, #12
+ c10142c:	e89d6800 	ldm	sp, {fp, sp, lr}
+ c101430:	e12fff1e 	bx	lr
+
+0c101434 <uart0_putint>:
+
+void uart0_putint( int32 i )
+{
+ c101434:	e1a0c00d 	mov	ip, sp
+ c101438:	e92dd800 	push	{fp, ip, lr, pc}
+ c10143c:	e24cb004 	sub	fp, ip, #4
+ c101440:	e24dd038 	sub	sp, sp, #56	; 0x38
+ c101444:	e50b0040 	str	r0, [fp, #-64]	; 0xffffffc0
+
+	char buf[32 + 1];
+	char *p = buf + 32;
+ c101448:	e24b3038 	sub	r3, fp, #56	; 0x38
+ c10144c:	e2833020 	add	r3, r3, #32
+ c101450:	e50b3010 	str	r3, [fp, #-16]
+
+	uint32 c;
+
+	*p = '\0'; 
+ c101454:	e51b3010 	ldr	r3, [fp, #-16]
+ c101458:	e3a02000 	mov	r2, #0
+ c10145c:	e5c32000 	strb	r2, [r3]
+
+	do{
+		c = i % 10;
+ c101460:	e51b1040 	ldr	r1, [fp, #-64]	; 0xffffffc0
+ c101464:	e59f3084 	ldr	r3, [pc, #132]	; c1014f0 <uart0_putint+0xbc>
+ c101468:	e0c32391 	smull	r2, r3, r1, r3
+ c10146c:	e1a02143 	asr	r2, r3, #2
+ c101470:	e1a03fc1 	asr	r3, r1, #31
+ c101474:	e0632002 	rsb	r2, r3, r2
+ c101478:	e1a03002 	mov	r3, r2
+ c10147c:	e1a03103 	lsl	r3, r3, #2
+ c101480:	e0833002 	add	r3, r3, r2
+ c101484:	e1a03083 	lsl	r3, r3, #1
+ c101488:	e0632001 	rsb	r2, r3, r1
+ c10148c:	e50b2014 	str	r2, [fp, #-20]	; 0xffffffec
+		*--p = '0' + c;
+ c101490:	e51b3010 	ldr	r3, [fp, #-16]
+ c101494:	e2433001 	sub	r3, r3, #1
+ c101498:	e50b3010 	str	r3, [fp, #-16]
+ c10149c:	e51b3014 	ldr	r3, [fp, #-20]	; 0xffffffec
+ c1014a0:	e20330ff 	and	r3, r3, #255	; 0xff
+ c1014a4:	e2833030 	add	r3, r3, #48	; 0x30
+ c1014a8:	e20320ff 	and	r2, r3, #255	; 0xff
+ c1014ac:	e51b3010 	ldr	r3, [fp, #-16]
+ c1014b0:	e5c32000 	strb	r2, [r3]
+		i = i/10;
+ c1014b4:	e51b3040 	ldr	r3, [fp, #-64]	; 0xffffffc0
+ c1014b8:	e59f2030 	ldr	r2, [pc, #48]	; c1014f0 <uart0_putint+0xbc>
+ c1014bc:	e0c21293 	smull	r1, r2, r3, r2
+ c1014c0:	e1a02142 	asr	r2, r2, #2
+ c1014c4:	e1a03fc3 	asr	r3, r3, #31
+ c1014c8:	e0633002 	rsb	r3, r3, r2
+ c1014cc:	e50b3040 	str	r3, [fp, #-64]	; 0xffffffc0
+			*--p = '0' + i;
+		}else{
+			*--p = '0' + c;
+		}
+		*/
+	}while(i != 0);
+ c1014d0:	e51b3040 	ldr	r3, [fp, #-64]	; 0xffffffc0
+ c1014d4:	e3530000 	cmp	r3, #0
+ c1014d8:	1affffe0 	bne	c101460 <uart0_putint+0x2c>
+
+	uart0_puts(p);
+ c1014dc:	e51b0010 	ldr	r0, [fp, #-16]
+ c1014e0:	ebffffbf 	bl	c1013e4 <uart0_puts>
+
+}
+ c1014e4:	e24bd00c 	sub	sp, fp, #12
+ c1014e8:	e89d6800 	ldm	sp, {fp, sp, lr}
+ c1014ec:	e12fff1e 	bx	lr
+ c1014f0:	66666667 	.word	0x66666667
+
+0c1014f4 <uart0_puthex>:
+
+void uart0_puthex( uint32 i )
+{
+ c1014f4:	e1a0c00d 	mov	ip, sp
+ c1014f8:	e92dd800 	push	{fp, ip, lr, pc}
+ c1014fc:	e24cb004 	sub	fp, ip, #4
+ c101500:	e24dd018 	sub	sp, sp, #24
+ c101504:	e50b0020 	str	r0, [fp, #-32]	; 0xffffffe0
+    char buf[8 + 1];
+    char *p = buf + 8;
+ c101508:	e24b301c 	sub	r3, fp, #28
+ c10150c:	e2833008 	add	r3, r3, #8
+ c101510:	e50b3010 	str	r3, [fp, #-16]
+    uint8 c;
+
+    *p = '\0';
+ c101514:	e51b3010 	ldr	r3, [fp, #-16]
+ c101518:	e3a02000 	mov	r2, #0
+ c10151c:	e5c32000 	strb	r2, [r3]
+
+    do {
+        c = i & 0xf;
+ c101520:	e51b3020 	ldr	r3, [fp, #-32]	; 0xffffffe0
+ c101524:	e20330ff 	and	r3, r3, #255	; 0xff
+ c101528:	e203300f 	and	r3, r3, #15
+ c10152c:	e54b3011 	strb	r3, [fp, #-17]	; 0xffffffef
+        if( c < 10 )
+ c101530:	e55b3011 	ldrb	r3, [fp, #-17]	; 0xffffffef
+ c101534:	e3530009 	cmp	r3, #9
+ c101538:	8a000008 	bhi	c101560 <uart0_puthex+0x6c>
+            *--p = '0' + c;
+ c10153c:	e51b3010 	ldr	r3, [fp, #-16]
+ c101540:	e2433001 	sub	r3, r3, #1
+ c101544:	e50b3010 	str	r3, [fp, #-16]
+ c101548:	e55b3011 	ldrb	r3, [fp, #-17]	; 0xffffffef
+ c10154c:	e2833030 	add	r3, r3, #48	; 0x30
+ c101550:	e20320ff 	and	r2, r3, #255	; 0xff
+ c101554:	e51b3010 	ldr	r3, [fp, #-16]
+ c101558:	e5c32000 	strb	r2, [r3]
+ c10155c:	ea000007 	b	c101580 <uart0_puthex+0x8c>
+        else
+            *--p = 'A' + c - 10;
+ c101560:	e51b3010 	ldr	r3, [fp, #-16]
+ c101564:	e2433001 	sub	r3, r3, #1
+ c101568:	e50b3010 	str	r3, [fp, #-16]
+ c10156c:	e55b3011 	ldrb	r3, [fp, #-17]	; 0xffffffef
+ c101570:	e2833037 	add	r3, r3, #55	; 0x37
+ c101574:	e20320ff 	and	r2, r3, #255	; 0xff
+ c101578:	e51b3010 	ldr	r3, [fp, #-16]
+ c10157c:	e5c32000 	strb	r2, [r3]
+        i = i >> 4;
+ c101580:	e51b3020 	ldr	r3, [fp, #-32]	; 0xffffffe0
+ c101584:	e1a03223 	lsr	r3, r3, #4
+ c101588:	e50b3020 	str	r3, [fp, #-32]	; 0xffffffe0
+    } while( i );
+ c10158c:	e51b3020 	ldr	r3, [fp, #-32]	; 0xffffffe0
+ c101590:	e3530000 	cmp	r3, #0
+ c101594:	1affffe1 	bne	c101520 <uart0_puthex+0x2c>
+
+    uart0_puts( p );
+ c101598:	e51b0010 	ldr	r0, [fp, #-16]
+ c10159c:	ebffff90 	bl	c1013e4 <uart0_puts>
+}
+ c1015a0:	e24bd00c 	sub	sp, fp, #12
+ c1015a4:	e89d6800 	ldm	sp, {fp, sp, lr}
+ c1015a8:	e12fff1e 	bx	lr
+
+0c1015ac <uart0_gets>:
+
+void uart0_gets( char *s )
+{
+ c1015ac:	e1a0c00d 	mov	ip, sp
+ c1015b0:	e92dd800 	push	{fp, ip, lr, pc}
+ c1015b4:	e24cb004 	sub	fp, ip, #4
+ c1015b8:	e24dd010 	sub	sp, sp, #16
+ c1015bc:	e50b0018 	str	r0, [fp, #-24]	; 0xffffffe8
+
+	char c;
+	do{
+		c = uart0_getchar();
+ c1015c0:	ebffff75 	bl	c10139c <uart0_getchar>
+ c1015c4:	e1a03000 	mov	r3, r0
+ c1015c8:	e54b300d 	strb	r3, [fp, #-13]
+		if( c != '\n'){
+ c1015cc:	e55b300d 	ldrb	r3, [fp, #-13]
+ c1015d0:	e353000a 	cmp	r3, #10
+ c1015d4:	0a000006 	beq	c1015f4 <uart0_gets+0x48>
+			*s = c;
+ c1015d8:	e51b3018 	ldr	r3, [fp, #-24]	; 0xffffffe8
+ c1015dc:	e55b200d 	ldrb	r2, [fp, #-13]
+ c1015e0:	e5c32000 	strb	r2, [r3]
+			s++;
+ c1015e4:	e51b3018 	ldr	r3, [fp, #-24]	; 0xffffffe8
+ c1015e8:	e2833001 	add	r3, r3, #1
+ c1015ec:	e50b3018 	str	r3, [fp, #-24]	; 0xffffffe8
+ c1015f0:	ea000002 	b	c101600 <uart0_gets+0x54>
+		}else{
+			*s = '\0';
+ c1015f4:	e51b3018 	ldr	r3, [fp, #-24]	; 0xffffffe8
+ c1015f8:	e3a02000 	mov	r2, #0
+ c1015fc:	e5c32000 	strb	r2, [r3]
+		}
+	}while(c != '\n');
+ c101600:	e55b300d 	ldrb	r3, [fp, #-13]
+ c101604:	e353000a 	cmp	r3, #10
+ c101608:	1affffec 	bne	c1015c0 <uart0_gets+0x14>
+
+
+
+
+
+}
+ c10160c:	e24bd00c 	sub	sp, fp, #12
+ c101610:	e89d6800 	ldm	sp, {fp, sp, lr}
+ c101614:	e12fff1e 	bx	lr
+
+0c101618 <uart0_getint>:
+
+int32 uart0_getint( void )
+{
+ c101618:	e1a0c00d 	mov	ip, sp
+ c10161c:	e92dd800 	push	{fp, ip, lr, pc}
+ c101620:	e24cb004 	sub	fp, ip, #4
+ c101624:	e24dd028 	sub	sp, sp, #40	; 0x28
+
+	char  s[20];
+	uart0_gets( s );
+ c101628:	e24b3030 	sub	r3, fp, #48	; 0x30
+ c10162c:	e1a00003 	mov	r0, r3
+ c101630:	ebffffdd 	bl	c1015ac <uart0_gets>
+
+
+	char *p = s;
+ c101634:	e24b3030 	sub	r3, fp, #48	; 0x30
+ c101638:	e50b3010 	str	r3, [fp, #-16]
+
+	int32 k = 0;
+ c10163c:	e3a03000 	mov	r3, #0
+ c101640:	e50b301c 	str	r3, [fp, #-28]	; 0xffffffe4
+
+
+	int i = 0;
+ c101644:	e3a03000 	mov	r3, #0
+ c101648:	e50b3014 	str	r3, [fp, #-20]	; 0xffffffec
+
+	int neg = 0;
+ c10164c:	e3a03000 	mov	r3, #0
+ c101650:	e50b3018 	str	r3, [fp, #-24]	; 0xffffffe8
+
+		if(*p == '-'){
+ c101654:	e51b3010 	ldr	r3, [fp, #-16]
+ c101658:	e5d33000 	ldrb	r3, [r3]
+ c10165c:	e353002d 	cmp	r3, #45	; 0x2d
+ c101660:	1a000017 	bne	c1016c4 <uart0_getint+0xac>
+		neg = 1;
+ c101664:	e3a03001 	mov	r3, #1
+ c101668:	e50b3018 	str	r3, [fp, #-24]	; 0xffffffe8
+		p++;
+ c10166c:	e51b3010 	ldr	r3, [fp, #-16]
+ c101670:	e2833001 	add	r3, r3, #1
+ c101674:	e50b3010 	str	r3, [fp, #-16]
+	}
+
+	
+	while( *p != '\0'){
+ c101678:	ea000012 	b	c1016c8 <uart0_getint+0xb0>
+
+		i*= 10;
+ c10167c:	e51b2014 	ldr	r2, [fp, #-20]	; 0xffffffec
+ c101680:	e1a03002 	mov	r3, r2
+ c101684:	e1a03103 	lsl	r3, r3, #2
+ c101688:	e0833002 	add	r3, r3, r2
+ c10168c:	e1a03083 	lsl	r3, r3, #1
+ c101690:	e50b3014 	str	r3, [fp, #-20]	; 0xffffffec
+
+		
+		k = *p - '0';
+ c101694:	e51b3010 	ldr	r3, [fp, #-16]
+ c101698:	e5d33000 	ldrb	r3, [r3]
+ c10169c:	e2433030 	sub	r3, r3, #48	; 0x30
+ c1016a0:	e50b301c 	str	r3, [fp, #-28]	; 0xffffffe4
+
+		i += k;
+ c1016a4:	e51b2014 	ldr	r2, [fp, #-20]	; 0xffffffec
+ c1016a8:	e51b301c 	ldr	r3, [fp, #-28]	; 0xffffffe4
+ c1016ac:	e0823003 	add	r3, r2, r3
+ c1016b0:	e50b3014 	str	r3, [fp, #-20]	; 0xffffffec
+		
+		p++;
+ c1016b4:	e51b3010 	ldr	r3, [fp, #-16]
+ c1016b8:	e2833001 	add	r3, r3, #1
+ c1016bc:	e50b3010 	str	r3, [fp, #-16]
+ c1016c0:	ea000000 	b	c1016c8 <uart0_getint+0xb0>
+		neg = 1;
+		p++;
+	}
+
+	
+	while( *p != '\0'){
+ c1016c4:	e1a00000 	nop			; (mov r0, r0)
+ c1016c8:	e51b3010 	ldr	r3, [fp, #-16]
+ c1016cc:	e5d33000 	ldrb	r3, [r3]
+ c1016d0:	e3530000 	cmp	r3, #0
+ c1016d4:	1affffe8 	bne	c10167c <uart0_getint+0x64>
+
+		i += k;
+		
+		p++;
+	}
+if( neg == 1){
+ c1016d8:	e51b3018 	ldr	r3, [fp, #-24]	; 0xffffffe8
+ c1016dc:	e3530001 	cmp	r3, #1
+ c1016e0:	1a000002 	bne	c1016f0 <uart0_getint+0xd8>
+	  i = -i;
+ c1016e4:	e51b3014 	ldr	r3, [fp, #-20]	; 0xffffffec
+ c1016e8:	e2633000 	rsb	r3, r3, #0
+ c1016ec:	e50b3014 	str	r3, [fp, #-20]	; 0xffffffec
+	}
+
+	return i;
+ c1016f0:	e51b3014 	ldr	r3, [fp, #-20]	; 0xffffffec
+	}
+ c1016f4:	e1a00003 	mov	r0, r3
+ c1016f8:	e24bd00c 	sub	sp, fp, #12
+ c1016fc:	e89d6800 	ldm	sp, {fp, sp, lr}
+ c101700:	e12fff1e 	bx	lr
+
+0c101704 <uart0_gethex>:
+
+
+
+
+uint32 uart0_gethex( void )
+{
+ c101704:	e1a0c00d 	mov	ip, sp
+ c101708:	e92dd800 	push	{fp, ip, lr, pc}
+ c10170c:	e24cb004 	sub	fp, ip, #4
+ c101710:	e24dde11 	sub	sp, sp, #272	; 0x110
+
+	char c[256];
+
+	uart0_gets(c);
+ c101714:	e24b3f46 	sub	r3, fp, #280	; 0x118
+ c101718:	e1a00003 	mov	r0, r3
+ c10171c:	ebffffa2 	bl	c1015ac <uart0_gets>
+	char *p = c;
+ c101720:	e24b3f46 	sub	r3, fp, #280	; 0x118
+ c101724:	e50b3010 	str	r3, [fp, #-16]
+
+	uint32 k = 0;
+ c101728:	e3a03000 	mov	r3, #0
+ c10172c:	e50b3014 	str	r3, [fp, #-20]	; 0xffffffec
+
+
+	uint32 i = 0;
+ c101730:	e3a03000 	mov	r3, #0
+ c101734:	e50b3018 	str	r3, [fp, #-24]	; 0xffffffe8
+	while( *p != '\0'){
+ c101738:	ea000027 	b	c1017dc <uart0_gethex+0xd8>
+			 i *= 16;
+ c10173c:	e51b3018 	ldr	r3, [fp, #-24]	; 0xffffffe8
+ c101740:	e1a03203 	lsl	r3, r3, #4
+ c101744:	e50b3018 	str	r3, [fp, #-24]	; 0xffffffe8
+			if(  ('0' <= *p)  && (*p <= '9')){
+ c101748:	e51b3010 	ldr	r3, [fp, #-16]
+ c10174c:	e5d33000 	ldrb	r3, [r3]
+ c101750:	e353002f 	cmp	r3, #47	; 0x2f
+ c101754:	9a000008 	bls	c10177c <uart0_gethex+0x78>
+ c101758:	e51b3010 	ldr	r3, [fp, #-16]
+ c10175c:	e5d33000 	ldrb	r3, [r3]
+ c101760:	e3530039 	cmp	r3, #57	; 0x39
+ c101764:	8a000004 	bhi	c10177c <uart0_gethex+0x78>
+					k = *p - '0';
+ c101768:	e51b3010 	ldr	r3, [fp, #-16]
+ c10176c:	e5d33000 	ldrb	r3, [r3]
+ c101770:	e2433030 	sub	r3, r3, #48	; 0x30
+ c101774:	e50b3014 	str	r3, [fp, #-20]	; 0xffffffec
+ c101778:	ea000010 	b	c1017c0 <uart0_gethex+0xbc>
+			}else if ( ('A' <= *p ) && ( *p <= 'F')){
+ c10177c:	e51b3010 	ldr	r3, [fp, #-16]
+ c101780:	e5d33000 	ldrb	r3, [r3]
+ c101784:	e3530040 	cmp	r3, #64	; 0x40
+ c101788:	9a000008 	bls	c1017b0 <uart0_gethex+0xac>
+ c10178c:	e51b3010 	ldr	r3, [fp, #-16]
+ c101790:	e5d33000 	ldrb	r3, [r3]
+ c101794:	e3530046 	cmp	r3, #70	; 0x46
+ c101798:	8a000004 	bhi	c1017b0 <uart0_gethex+0xac>
+				k = *p + 10 - 'A';
+ c10179c:	e51b3010 	ldr	r3, [fp, #-16]
+ c1017a0:	e5d33000 	ldrb	r3, [r3]
+ c1017a4:	e2433037 	sub	r3, r3, #55	; 0x37
+ c1017a8:	e50b3014 	str	r3, [fp, #-20]	; 0xffffffec
+ c1017ac:	ea000003 	b	c1017c0 <uart0_gethex+0xbc>
+			}else{
+				k = *p + 10 - 'a';
+ c1017b0:	e51b3010 	ldr	r3, [fp, #-16]
+ c1017b4:	e5d33000 	ldrb	r3, [r3]
+ c1017b8:	e2433057 	sub	r3, r3, #87	; 0x57
+ c1017bc:	e50b3014 	str	r3, [fp, #-20]	; 0xffffffec
+			}
+			i += k;
+ c1017c0:	e51b2018 	ldr	r2, [fp, #-24]	; 0xffffffe8
+ c1017c4:	e51b3014 	ldr	r3, [fp, #-20]	; 0xffffffec
+ c1017c8:	e0823003 	add	r3, r2, r3
+ c1017cc:	e50b3018 	str	r3, [fp, #-24]	; 0xffffffe8
+			p++;
+ c1017d0:	e51b3010 	ldr	r3, [fp, #-16]
+ c1017d4:	e2833001 	add	r3, r3, #1
+ c1017d8:	e50b3010 	str	r3, [fp, #-16]
+
+	uint32 k = 0;
+
+
+	uint32 i = 0;
+	while( *p != '\0'){
+ c1017dc:	e51b3010 	ldr	r3, [fp, #-16]
+ c1017e0:	e5d33000 	ldrb	r3, [r3]
+ c1017e4:	e3530000 	cmp	r3, #0
+ c1017e8:	1affffd3 	bne	c10173c <uart0_gethex+0x38>
+			}
+			i += k;
+			p++;
+}
+
+	return i ;
+ c1017ec:	e51b3018 	ldr	r3, [fp, #-24]	; 0xffffffe8
+
+}
+ c1017f0:	e1a00003 	mov	r0, r3
+ c1017f4:	e24bd00c 	sub	sp, fp, #12
+ c1017f8:	e89d6800 	ldm	sp, {fp, sp, lr}
+ c1017fc:	e12fff1e 	bx	lr
